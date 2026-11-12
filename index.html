@@ -116,6 +116,10 @@ input:focus,select:focus{outline:2px solid var(--navy);outline-offset:1px;border
 .kpi.fail .rating{background:#fff}
 .kpi.na{background:var(--inset)}
 .kpi.na .value{color:var(--muted)}
+.kpi.pending{background:var(--kpi);border-color:var(--line)}
+.kpi.pending .value{color:var(--muted)}
+.deal-flag.pending{background:var(--inset);color:var(--ink);border-color:var(--line)}
+.deal-flag.pending strong{color:var(--ink)}
 .rate-note{font-size:13px;color:var(--muted);margin:10px 0 0}
 .explainer{margin-top:16px}
 .explainer ol,.explainer ul{margin:8px 0 0;padding:0 0 0 1.15rem}
@@ -194,8 +198,8 @@ footer a:hover{color:#6E2F12}
   <div class="grid-page">
     <section class="card" id="inputs" aria-labelledby="inputs-h">
       <h2 id="inputs-h">The property</h2>
-      <p class="sec-help">Shaded cells are yours to edit. Default loan terms are <strong>examples, not quotes</strong> and not an offer to lend.</p>
-      <div class="regz">Rates, down payments and fees shown here are example assumptions, not advertised rates or payments. Confirm actual terms with a lender.</div>
+      <p class="sec-help">Shaded cells are yours to edit. Enter your own loan terms. Results are estimates for education, not a loan offer or quote.</p>
+      <div class="regz">Enter your own rate, down payment and term. Figures here are estimates, not advertised rates or payments. Confirm actual terms with a lender.</div>
 
       <label class="field">Purchase price
         <input type="number" name="price" min="0" step="1000">
@@ -232,14 +236,14 @@ footer a:hover{color:#6E2F12}
       </div>
       <div class="row row-2">
         <label class="field">Balloon after (years)
-          <span class="hint">Optional. Leave blank or 0 if there is no balloon. The monthly payment still uses the amortization term above, for example a 25-year amortization with a 5-year balloon.</span>
+          <span class="hint">Optional. Leave blank or 0 if there is no balloon. The monthly payment still uses the amortization term above, even if a balloon comes due sooner.</span>
           <input type="number" name="balloon" min="0" max="40" step="1" inputmode="numeric">
         </label>
       </div>
       <p class="hint" id="loan-hint"></p>
       <p class="example-apr" id="example-apr" hidden></p>
-      <p class="note-loan" id="fha-block-note" hidden>FHA house hack is for 1–4 unit properties, so it isn’t available for this building. The loan type was switched to Conventional example terms.</p>
-      <p class="note-loan" id="multi-note" hidden>These Conventional and DSCR figures are example terms for 1–4 unit residential loans. They are not representative of commercial multifamily financing.</p>
+      <p class="note-loan" id="fha-block-note" hidden>FHA house hack is for 1–4 unit properties, so it isn’t available for this building. The loan type was switched to Conventional.</p>
+      <p class="note-loan" id="multi-note" hidden>These Conventional and DSCR figures use 1–4 unit residential loan assumptions. They are not representative of commercial multifamily financing.</p>
 
       <h3>Operating costs</h3>
       <div class="row row-2">
@@ -327,7 +331,7 @@ footer a:hover{color:#6E2F12}
   <p>Harbor Realty and Management Group</p>
   <p>Cell: <a href="tel:+16085152548">608-515-2548</a></p>
   <p><a href="https://www.toddrenard.com/">toddrenard.com</a></p>
-  <p>Estimates only, not a rate quote, loan approval, tax or financial advice. Confirm terms with a lender and tax advisor. Example rates, down payments and fees are illustrative assumptions, not offered or advertised terms.</p>
+  <p>Estimates only, not a rate quote, loan approval, tax or financial advice. Confirm terms with a lender and tax advisor. Rates, down payments and fees you enter are used only to estimate results; they are not offered or advertised terms.</p>
   <p>For educational purposes; not a loan offer. Todd Renard is a licensed real estate agent, not a lender.</p>
   <p>This page runs entirely on your device. It does not send your numbers anywhere, and it uses no cookies or analytics. If you choose to save, a copy is stored only in this browser. Use “Clear my data” to remove it.</p>
   <p class="print-only">Printed from the Rental Property Snapshot calculator for Todd Renard, REALTOR®, Harbor Realty and Management Group. Figures are estimates as of the date of printing. Green / amber / red marks are general rules of thumb, not advice.</p>
@@ -840,20 +844,20 @@ footer a:hover{color:#6E2F12}
   const MAX_UNITS = 50;
   const LOANS = [
     {id:"conventional", label:"Conventional", program:"Conventional Investment 30yr (25% down)", down:0.25, rate:0.0725, term:30,
-      hint:"Example terms only: 25% down, 7.25% rate, 30-year term, plus example points and lender fees. If you put down less than 20%, an example PMI rate is included. Not a quote."},
+      hint:"A typical investment-property mortgage. If you put down less than 20%, mortgage insurance is included in the payment. Not a quote."},
     {id:"dscr", label:"DSCR", program:"DSCR 30yr Fixed (25% down)", down:0.25, rate:0.075, term:30,
-      hint:"Example terms only: 25% down, 7.50% rate, 30-year term, plus example DSCR points and lender fees. Qualifies on the property’s rent, not your personal income. Not a quote."},
+      hint:"Qualifies on the property’s rent, not your personal income. Not a quote."},
     {id:"fha", label:"FHA house hack", program:"FHA 2-4 Unit House Hack (3.5% down)", down:0.035, rate:0.065, term:30,
-      hint:"Example terms only: 3.5% down, 6.50% rate, 30-year term, plus example FHA upfront and annual mortgage insurance. You would need to live in unit 1. Not a quote."},
+      hint:"You would need to live in unit 1. Upfront and annual mortgage insurance are included in the estimate when you enter terms. Not a quote."},
     {id:"cash", label:"Cash", program:"Cash Purchase (no loan)", down:1, rate:0, term:30,
       hint:"A cash purchase has no mortgage, so DSCR does not apply. Cash-on-cash and cap rate will match, because all of the price (plus costs) is cash you put in."}
   ];
   function defaultState() {
     return {
       price: 285000, unitCount: 1, rents: [2350], loanType: "conventional",
-      down: 0.25, rate: 0.0725, term: 30, balloon: 0,
+      down: "", rate: "", term: "", balloon: 0,
       propTax: 3400, insurance: 1700,
-      vacancy: 0.06, maintCapexPct: 0.12, mgmtPct: 0.08, otherMonthly: 65,
+      vacancy: 0.06, maintCapexPct: 0.10, mgmtPct: 0.08, otherMonthly: 0,
       closingCosts: 6000, rehab: 0, otherInc: 50, appreciation: 0.03
     };
   }
@@ -911,10 +915,46 @@ footer a:hover{color:#6E2F12}
       unitsRoll: roll
     });
   }
+  function isFilledNumber(v) {
+    if (v === "" || v == null) return false;
+    return isFinite(Number(v));
+  }
+  function loanTermsReady(s) {
+    if (!s || s.loanType === "cash") return true;
+    return isFilledNumber(s.down) && isFilledNumber(s.rate) && isFilledNumber(s.term) && Number(s.term) > 0;
+  }
+  function pendingLoanKpi(key, label) {
+    return {
+      key: key, label: label, value: null, display: "Enter loan terms",
+      rate: {tone:"pending", rating:"", mean:"Enter a down payment, interest rate and amortization to see this figure.", bench:""}
+    };
+  }
   function computeSnapshot(s) {
+    if (!loanTermsReady(s)) {
+      const op = Object.assign({}, s, {loanType:"cash", down:1, rate:0, term:30, balloon:0});
+      const input = toEngineInput(op);
+      const result = RA.compute(input, {programs: RA.PROGRAMS, useOverrides: true});
+      const rent = rentTotal(s);
+      const onePct = (s.price > 0) ? rent / s.price : 0;
+      const exp = (result.gpi > 0) ? (result.gpi - result.noim) / result.gpi : 0;
+      const kpis = [
+        pendingLoanKpi("cf", "Monthly cash flow"),
+        pendingLoanKpi("coc", "Cash-on-cash return"),
+        {key:"cap", label:"Cap rate", value: result.cap, display: fmtPct(result.cap, 2), rate: rateCap(result.cap)},
+        pendingLoanKpi("dscr", "DSCR (rent ÷ PITIA)"),
+        {key:"one", label:"1% rule (rent ÷ price)", value: onePct, display: fmtPct(onePct, 2), rate: rateOnePct(onePct)},
+        {key:"exp", label:"Expense ratio", value: exp, display: fmtPct(exp, 1), rate: rateExpense(exp)}
+      ];
+      const safe = Object.assign({}, result, {
+        cfm: null, cfa: null, coc: null, dscrl: null, dscrn: null,
+        pi: null, cashin: null, balloond: null, pitia: null, loan: null,
+        pendingLoan: true
+      });
+      return {input, result: safe, kpis: kpis, rentTotal: rent, pendingLoan: true};
+    }
     const input = toEngineInput(s);
     const result = RA.compute(input, {programs: RA.PROGRAMS, useOverrides: true});
-    return {input, result, kpis: kpisFrom(result, s), rentTotal: rentTotal(s)};
+    return {input, result, kpis: kpisFrom(result, s), rentTotal: rentTotal(s), pendingLoan: false};
   }
   function fmtUsd(v, d) {
     if (typeof v !== "number" || !isFinite(v)) return "—";
@@ -1068,7 +1108,7 @@ footer a:hover{color:#6E2F12}
       {key:"exp", label:"Expense ratio", value: exp, display: fmtPct(exp, 1), rate: rateExpense(exp)}
     ];
   }
-  const API = {LOANS, MAX_UNITS, defaultState, loanById, rentTotal, toEngineInput, computeSnapshot, kpisFrom, fmtUsd, fmtPct, fmtX, bandUsd0, bandRatio, bandX, rateCashFlow, rateCoc, rateCap, rateDscr, rateOnePct, rateExpense, computeApr, aprCashflows, solveMonthlyRate, fmtApr};
+  const API = {LOANS, MAX_UNITS, defaultState, loanById, rentTotal, toEngineInput, computeSnapshot, kpisFrom, loanTermsReady, isFilledNumber, fmtUsd, fmtPct, fmtX, bandUsd0, bandRatio, bandX, rateCashFlow, rateCoc, rateCap, rateDscr, rateOnePct, rateExpense, computeApr, aprCashflows, solveMonthlyRate, fmtApr};
   if (typeof module !== "undefined" && module.exports) module.exports = API;
   root.RentalSnapshotCore = API;
 })(typeof window !== "undefined" ? window : globalThis);
@@ -1077,7 +1117,8 @@ footer a:hover{color:#6E2F12}
   "use strict";
   const RA = window.RentalAnalyzer;
   const C = window.RentalSnapshotCore;
-  const STORE = "harbor-rental-snapshot-v1";
+  const STORE = "harbor-rental-snapshot-v2";
+  const STORE_LEGACY = "harbor-rental-snapshot-v1";
   let state = C.defaultState();
 
   function $(sel, root) { return (root || document).querySelector(sel); }
@@ -1112,11 +1153,7 @@ footer a:hover{color:#6E2F12}
 
   function enforceLoanForUnits() {
     if (state.unitCount > 4 && state.loanType === "fha") {
-      const loan = C.loanById("conventional");
       state.loanType = "conventional";
-      state.down = loan.down;
-      state.rate = loan.rate;
-      state.term = loan.term;
       return true;
     }
     return false;
@@ -1136,11 +1173,7 @@ footer a:hover{color:#6E2F12}
   }
 
   function setLoan(id) {
-    const loan = C.loanById(id);
     state.loanType = id;
-    state.down = loan.down;
-    state.rate = loan.rate;
-    state.term = loan.term;
     fillInputs();
     fillSegs();
     recalc();
@@ -1173,9 +1206,9 @@ footer a:hover{color:#6E2F12}
         el.value = v ? String(v) : "";
       } else if (el.dataset.unit === "pct") {
         const places = Number(el.dataset.places || 2);
-        el.value = v == null ? "" : (Number(v) * 100).toFixed(places);
+        el.value = (v === "" || v == null) ? "" : (Number(v) * 100).toFixed(places);
       } else {
-        el.value = v == null ? "" : v;
+        el.value = (v === "" || v == null) ? "" : v;
       }
     });
     renderUnits();
@@ -1190,7 +1223,10 @@ footer a:hover{color:#6E2F12}
 
   function parseField(el) {
     const n = Number(el.value);
-    if (el.value === "" || !isFinite(n)) return 0;
+    if (el.value === "" || !isFinite(n)) {
+      if (el.name === "down" || el.name === "rate" || el.name === "term") return "";
+      return 0;
+    }
     return el.dataset.unit === "pct" ? n / 100 : n;
   }
 
@@ -1208,16 +1244,21 @@ footer a:hover{color:#6E2F12}
     $("#kpis").innerHTML = list.map(k => `<article class="kpi ${k.rate.tone}">
         <div class="label">${k.label}</div>
         <div class="value">${k.display}</div>
-        <span class="rating">${k.rate.rating}</span>
-        <p class="mean">${k.rate.mean}</p>
-        <p class="bench">${k.rate.bench}</p>
+        ${k.rate.rating ? `<span class="rating">${k.rate.rating}</span>` : ""}
+        ${k.rate.mean ? `<p class="mean">${k.rate.mean}</p>` : ""}
+        ${k.rate.bench ? `<p class="bench">${k.rate.bench}</p>` : ""}
       </article>`).join("");
   }
 
-  function renderSnap(r) {
+  function renderSnap(r, pending) {
     const y5 = r.projection && r.projection[4];
     if (!y5) { $("#snap").innerHTML = ""; return; }
-    const items = [
+    const items = pending ? [
+      ["Estimated value, year 5", C.fmtUsd(y5.value, 0)],
+      ["Loan balance, year 5", "Enter loan terms"],
+      ["Equity, year 5", "Enter loan terms"],
+      ["Cash flow collected, years 1–5", "Enter loan terms"]
+    ] : [
       ["Estimated value, year 5", C.fmtUsd(y5.value, 0)],
       ["Loan balance, year 5", C.fmtUsd(y5.balance, 0)],
       ["Equity, year 5", C.fmtUsd(y5.equity, 0)],
@@ -1229,7 +1270,7 @@ footer a:hover{color:#6E2F12}
   function recalc() {
     const out = C.computeSnapshot(state);
     renderKpis(out.kpis);
-    renderSnap(out.result);
+    renderSnap(out.result, out.pendingLoan);
     const n = state.unitCount;
     $("#rent-total").textContent = n + (n === 1 ? " unit" : " units") + " · Total monthly rent " + C.fmtUsd(out.rentTotal, 0);
     $("#fha-note").hidden = state.loanType !== "fha";
@@ -1243,28 +1284,39 @@ footer a:hover{color:#6E2F12}
     }
     const multi = $("#multi-note");
     if (multi) multi.hidden = !(state.unitCount > 4 && (state.loanType === "conventional" || state.loanType === "dscr"));
+    const pending = !!out.pendingLoan;
     const feesNote = state.loanType === "cash"
       ? "Cash invested is the price plus closing costs and any upfront rehab / CapEx."
-      : "Cash invested includes the down payment, closing costs, any upfront rehab / CapEx, and example loan points and fees. The ongoing monthly maintenance + CapEx reserve is a separate operating cost, not added here.";
+      : "Cash invested includes the down payment, closing costs, any upfront rehab / CapEx, and typical points and lender fees used in this estimate (not a quote). The ongoing monthly maintenance + CapEx reserve is a separate operating cost, not added here.";
     const rehabBit = state.rehab > 0 ? " Upfront rehab / CapEx of " + C.fmtUsd(state.rehab, 0) + " is included." : "";
-    $("#cash-line").textContent = "Cash you put in: " + C.fmtUsd(out.result.cashin, 0) + "." + rehabBit + " " + feesNote;
+    if (pending) {
+      $("#cash-line").textContent = "Cash you put in: Enter loan terms." + (state.rehab > 0 ? rehabBit : "") + " " + feesNote;
+    } else {
+      $("#cash-line").textContent = "Cash you put in: " + C.fmtUsd(out.result.cashin, 0) + "." + rehabBit + " " + feesNote;
+    }
     const flag = $("#balloon-flag");
     const yrs = Number(state.balloon) || 0;
     const due = out.result.balloond;
-    const showBalloon = state.loanType !== "cash" && yrs > 0 && typeof due === "number" && due > 0;
+    const showBalloon = !pending && state.loanType !== "cash" && yrs > 0 && typeof due === "number" && due > 0;
+    const balloonPending = pending && state.loanType !== "cash" && yrs > 0;
     if (flag) {
-      flag.hidden = !showBalloon;
+      flag.classList.toggle("pending", balloonPending);
+      flag.hidden = !(showBalloon || balloonPending);
       if (showBalloon) {
         flag.innerHTML = "<strong>Balloon payment.</strong> About " + C.fmtUsd(due, 0) +
           " due at year " + yrs + " — you’d need to refinance, sell, or pay it off. " +
-          "Refinance terms aren’t guaranteed, and this estimate does not change the monthly payment, which is still based on the " +
-          state.term + "-year amortization.";
+          "Refinance terms aren’t guaranteed, and this estimate does not change the monthly payment, which is still based on the amortization term.";
+      } else if (balloonPending) {
+        flag.innerHTML = "<strong>Balloon payment.</strong> Enter loan terms to estimate the amount due.";
       }
     }
     const aprEl = $("#example-apr");
-    const apr = (state.loanType === "cash") ? null : C.computeApr(out.result);
+    const apr = (pending || state.loanType === "cash") ? null : C.computeApr(out.result);
     if (aprEl) {
-      if (apr == null) {
+      if (pending && state.loanType !== "cash") {
+        aprEl.hidden = false;
+        aprEl.innerHTML = "Example APR: Enter loan terms";
+      } else if (apr == null) {
         if (state.loanType === "cash") {
           aprEl.hidden = false;
           aprEl.innerHTML = "<span class=\"apr-value\">Example APR n/a</span> A cash purchase has no loan, so there is no APR.";
@@ -1275,22 +1327,34 @@ footer a:hover{color:#6E2F12}
       } else {
         aprEl.hidden = false;
         aprEl.innerHTML = "<span class=\"apr-value\">Example APR " + C.fmtApr(apr) + "</span> " +
-          "This estimate includes the example interest rate, points, lender fees, and any mortgage insurance in the payment stream. It does not include property tax or homeowners insurance. It is an example only — not a quote, not a closing disclosure, and not an advertised credit term.";
+          "This estimate includes the interest rate you entered, plus points, lender fees, and any mortgage insurance in the payment stream. It does not include property tax or homeowners insurance. It is an estimate only — not a quote, not a closing disclosure, and not an advertised credit term.";
       }
     }
     const loan = C.loanById(state.loanType);
     const recap = $("#print-recap");
     if (recap) {
-      const rateTxt = state.loanType === "cash" ? "cash purchase" : (C.fmtPct(state.rate, 2) + " example rate, " + state.term + "-year amortization, " + C.fmtPct(state.down, 1) + " down");
-      let extra = "";
+      let rateTxt, cashTxt, aprTxt, extra = "";
+      if (state.loanType === "cash") {
+        rateTxt = "cash purchase";
+        cashTxt = " · Cash in " + C.fmtUsd(out.result.cashin, 0);
+        aprTxt = " · Example APR n/a";
+      } else if (pending) {
+        rateTxt = "Enter loan terms";
+        cashTxt = " · Cash in: Enter loan terms";
+        aprTxt = " · Example APR: Enter loan terms";
+      } else {
+        rateTxt = C.fmtPct(state.rate, 2) + " rate, " + state.term + "-year amortization, " + C.fmtPct(state.down, 1) + " down";
+        cashTxt = " · Cash in " + C.fmtUsd(out.result.cashin, 0);
+        aprTxt = apr == null ? "" : (" · Example APR " + C.fmtApr(apr));
+      }
       if (showBalloon) extra += " · Balloon after " + yrs + " years, about " + C.fmtUsd(due, 0) + " due (refinance terms aren’t guaranteed)";
+      else if (balloonPending) extra += " · Balloon after " + yrs + " years (enter loan terms to estimate the amount due)";
       if (state.rehab > 0) extra += " · Upfront rehab / CapEx " + C.fmtUsd(state.rehab, 0);
       recap.innerHTML = "<strong>Snapshot of the numbers used</strong> · Price " + C.fmtUsd(state.price, 0) +
         " · " + state.unitCount + (state.unitCount===1?" unit":" units") +
         " · Rent " + C.fmtUsd(out.rentTotal, 0) + "/mo · " + loan.label + " · " + rateTxt +
-        " · Cash in " + C.fmtUsd(out.result.cashin, 0) + extra +
-        (apr == null ? (state.loanType === "cash" ? " · Example APR n/a" : "") : (" · Example APR " + C.fmtApr(apr))) +
-        ". Example terms only, not a quote.";
+        cashTxt + extra + aprTxt +
+        ". Estimates only, not a quote.";
     }
     window.__rentalV2 = Object.assign({state}, out);
     postResize();
@@ -1343,13 +1407,14 @@ footer a:hover{color:#6E2F12}
   function clearData() {
     try {
       localStorage.removeItem(STORE);
+      localStorage.removeItem(STORE_LEGACY);
     } catch (e) {}
     state = C.defaultState();
     fillInputs();
     fillSegs();
     recalc();
     const el = $("#save-msg");
-    if (el) el.textContent = "Local data cleared. Example figures restored.";
+    if (el) el.textContent = "Local data cleared. Starting figures restored.";
   }
 
   window.RentalSnapshot = {

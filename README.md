@@ -19,16 +19,16 @@ To embed the calculator in a page (for example at toddrenard.com/rental-calculat
 ## What’s on the page
 
 - **Units:** buttons for 1, 2, 3 or 4 units (a house through a fourplex). **Add more units** grows the rent roll one row at a time, up to 50. Empty extra rows can be removed. FHA house hack is available only for 1–4 units; if you add a fifth unit, the loan type switches to Conventional and FHA is disabled. Conventional and DSCR terms shown for 5 or more units are example 1–4 unit residential terms, not commercial multifamily financing.
-- **Loan type:** Conventional, DSCR, FHA house hack, or Cash. Choosing a type fills example down payment, rate and amortization only — clearly labeled as examples, not quotes and not an offer to lend.
-- **Example APR:** shown with the example loan terms as a nominal annual percentage rate (twelve times the monthly unit-period rate), estimated from the example interest rate, points, lender fees, and any mortgage insurance, in the spirit of Regulation Z Appendix J. Property tax and homeowners insurance are not included. It is an example only — not a quote, not a closing disclosure, and not an advertised credit term. A cash purchase shows n/a.
-- **Balloon after (years):** optional. Leave blank or 0 if there is no balloon. The monthly payment still uses the amortization term (for example, a 25-year amortization with a 5-year balloon). When a balloon year is set, the remaining loan balance is shown in plain English. Refinance terms are not guaranteed, and the estimate is flagged in amber.
+- **Loan type:** Conventional, DSCR, FHA house hack, or Cash. Interest rate, down payment and amortization start blank and stay blank when you switch types — you enter those figures. Cash has no mortgage, so those fields do not apply. This is not a quote and not an offer to lend.
+- **Example APR:** shown once you enter loan terms, as a nominal annual percentage rate (twelve times the monthly unit-period rate), estimated from the interest rate you entered, plus points, lender fees, and any mortgage insurance, in the spirit of Regulation Z Appendix J. Property tax and homeowners insurance are not included. It is an estimate only — not a quote, not a closing disclosure, and not an advertised credit term. A cash purchase shows n/a.
+- **Balloon after (years):** optional. Leave blank or 0 if there is no balloon. The monthly payment still uses the amortization term, even if a balloon comes due sooner. When a balloon year is set, the remaining loan balance is shown in plain English. Refinance terms are not guaranteed, and the estimate is flagged in amber.
 - **Costs:** annual tax and insurance, vacancy %, an ongoing monthly maintenance + CapEx *reserve* (% of rent), management % of rent, other monthly costs, and an optional **upfront rehab / CapEx** one-time amount (default 0). The upfront amount is added to cash invested so cash-on-cash reflects it. It is not the same as the ongoing monthly reserve.
 - **Six KPI cards**, each with a value, a green / amber / red rule-of-thumb rating, a one-sentence “what this means,” and a “what good looks like” line. Ratings use the same rounded figure the card displays.
 - **KPIs of a successful rental** — a short educational list of the same six ideas, plus a reminder that rules of thumb vary.
 - **More detail (optional, collapsed):** example closing costs, other income, an appreciation assumption, and a five-year equity snapshot.
 - **Download PDF** uses the browser print dialog and a print stylesheet. It produces a 1–2 page KPI summary. Printing still works when the page is embedded in an iframe, as long as the iframe allows dialogs (see `EMBED.md`).
 
-Example figures are pre-filled so you can see how the cards behave. FHA house hack treats unit 1 as the home you’d live in, so that unit’s rent is not counted as income. Conventional loans with less than 20% down include an example PMI rate (0.75%, dropping at 78% LTV). Cash has no mortgage, so DSCR is n/a.
+Property, rent and operating-cost figures are pre-filled so you can see how the cards behave. Loan rate, down payment and term start blank; until you enter them, loan-dependent results (cash flow, cash-on-cash, DSCR, cash invested, P&I, balloon and Example APR) show “Enter loan terms.” Cap rate, the 1% rule and the expense ratio still calculate because they do not depend on a loan. FHA house hack treats unit 1 as the home you’d live in, so that unit’s rent is not counted as income. If a conventional down payment is under 20%, mortgage insurance is included in the estimated payment. Cash has no mortgage, so DSCR is n/a.
 
 ## KPI bands (rules of thumb, not advice)
 
@@ -62,7 +62,7 @@ DSCR bands follow common published lender guides. Programs often start around **
 
 ## Privacy and branding
 
-The page makes no network calls and uses no analytics, cookies or form posts. Fonts are system stacks (Georgia for headings, Helvetica / Arial for body) so the file can be embedded without third-party font requests. Optional saving uses `localStorage` on this device only, under the key `harbor-rental-snapshot-v1`. **Clear my data** removes only that key and restores the examples.
+The page makes no network calls and uses no analytics, cookies or form posts. Fonts are system stacks (Georgia for headings, Helvetica / Arial for body) so the file can be embedded without third-party font requests. Optional saving uses `localStorage` on this device only, under the key `harbor-rental-snapshot-v2`. **Clear my data** removes that key and the prior `harbor-rental-snapshot-v1` key, then restores the starting figures. An older saved copy is not read on load.
 
 Branding is **Todd Renard, REALTOR®** and Harbor Realty and Management Group, with his cell and toddrenard.com in the footer. Visual language follows the cream-and-sienna realtor-side palette: page `#F7F1E8`, sienna `#A0522D` / `#8B3E1A`, ink `#2B2420`.
 
@@ -72,7 +72,7 @@ Disclaimer, shown on the page and on the PDF:
 
 > For educational purposes; not a loan offer. Todd Renard is a licensed real estate agent, not a lender.
 
-Example rates, down payments and fees are not advertised rates or payments.
+Rates, down payments and fees you enter are used only to estimate results; they are not advertised rates or payments.
 
 ## Limits
 

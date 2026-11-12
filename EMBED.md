@@ -40,10 +40,10 @@ The starting `min-height` avoids a short flash before the first resize message. 
 
 ## Recommended height
 
-The iframe posts its content height whenever the layout changes. Measured on the default example figures (More detail closed):
+The iframe posts its content height whenever the layout changes. Measured on the default starting figures (loan rate, down payment and term blank; More detail closed):
 
-- **Mobile (about 390px wide):** about **7,800px** tall (7,759px measured on the default example, including the Example APR line). Use a starting `min-height` of **7,800px**.
-- **Desktop (about 1,200–1,280px wide, two-column layout):** about **4,600px** tall (4,556px measured on the same default example). Use a starting `min-height` of **4,700px** only if you serve a desktop-only starting height. For a single snippet that also works on phones before the first resize message, prefer the mobile starting height (**7,800px**) as in the example above, and rely on the handler to clear `min-height`.
+- **Mobile (about 390px wide):** about **7,500px** tall (7,447px measured on the default starting figures, including the Example APR “Enter loan terms” line). Use a starting `min-height` of **7,800px** so the page is not clipped before the first resize message.
+- **Desktop (about 1,200–1,280px wide, two-column layout):** about **4,500px** tall (4,453px measured on the same default starting figures). Use a starting `min-height` of **4,700px** only if you serve a desktop-only starting height. For a single snippet that also works on phones before the first resize message, prefer the mobile starting height (**7,800px**) as in the example above, and rely on the handler to clear `min-height`.
 
 If the visitor opens “More detail,” adds many unit rows, or a balloon notice appears, the posted height will grow and the script above will stretch the frame. If `postMessage` is unavailable, use the mobile starting height so the page is not clipped on a phone.
 
