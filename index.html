@@ -91,6 +91,8 @@ input:focus,select:focus{outline:2px solid var(--navy);outline-offset:1px;border
 .unit-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .cashline{background:var(--key);color:var(--rust-d);border-radius:8px;padding:10px 12px;font-size:14px;font-weight:650;margin:12px 0 0}
 .regz{background:var(--inset);border-left:4px solid var(--rust);padding:8px 12px;border-radius:0 8px 8px 0;font-size:13px;color:var(--ink);margin:0 0 12px}
+.example-apr{margin:8px 0 10px;padding:10px 12px;background:var(--inset);border-left:4px solid var(--sienna);border-radius:0 8px 8px 0;font-size:14px;color:var(--ink);line-height:1.4}
+.example-apr .apr-value{font-family:var(--font-display);font-weight:700;font-size:1.15rem;color:var(--accent);margin-right:6px}
 .note-fha,.note-loan{background:var(--inset);border-radius:8px;padding:8px 12px;font-size:13.5px;color:var(--ink);margin:8px 0 10px}
 .deal-flag{background:var(--amber-bg);color:var(--amber);border:1px solid #e2d09a;border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.4;margin:0 0 12px}
 .deal-flag strong{color:var(--amber)}
@@ -164,7 +166,6 @@ footer a:hover{color:#6E2F12}
   .print-only{display:block}
   footer{padding-top:6px}
 }
-
 </style>
 </head>
 <body>
@@ -236,6 +237,7 @@ footer a:hover{color:#6E2F12}
         </label>
       </div>
       <p class="hint" id="loan-hint"></p>
+      <p class="example-apr" id="example-apr" hidden></p>
       <p class="note-loan" id="fha-block-note" hidden>FHA house hack is for 1–4 unit properties, so it isn’t available for this building. The loan type was switched to Conventional example terms.</p>
       <p class="note-loan" id="multi-note" hidden>These Conventional and DSCR figures are example terms for 1–4 unit residential loans. They are not representative of commercial multifamily financing.</p>
 
@@ -830,8 +832,6 @@ footer a:hover{color:#6E2F12}
   root.RentalAnalyzer = API;
 })(typeof window !== "undefined" ? window : globalThis);
 
-</script>
-<script>
 /* Maps the simplified snapshot form onto the tested workbook engine, and rates KPIs.
    Works in Node and in the browser. */
 (function (root) {
@@ -990,6 +990,70 @@ footer a:hover{color:#6E2F12}
     if (v <= 0.65) return amber("Above the 50% shortcut", "Operating costs are eating more than half of potential rent. The deal can still work, but cash flow will be tighter.", "What good looks like: many investors plan around 50% of rent for vacancy and operating costs, before the mortgage.");
     return fail("High costs", "Vacancy and operating costs take more than 65% of potential rent, leaving little room for a mortgage or a surplus.", "What good looks like: a common planning shortcut is about 50% of rent for vacancy and operating costs.");
   }
+
+  // Example APR (nominal, 12 x monthly unit-period rate), in the spirit of Reg Z Appendix J.
+  // Prepaid finance charges = points + lender fees + financed upfront MI/MIP.
+  // Payment stream is monthly P&I plus MI/MIP from the engine schedule, and a balloon if set.
+  // Property tax, homeowners insurance and HOA are not finance charges and are not in the APR.
+  function npvMonthly(rate, cashflows) {
+    let s = 0;
+    for (let t = 0; t < cashflows.length; t++) {
+      s += cashflows[t] / Math.pow(1 + rate, t);
+    }
+    return s;
+  }
+  function solveMonthlyRate(cashflows) {
+    if (!cashflows || cashflows.length < 2) return null;
+    const npv0 = npvMonthly(0, cashflows);
+    if (Math.abs(npv0) < 1e-8) return 0;
+    let lo = 0, hi = 0.05;
+    let fLo = npvMonthly(lo, cashflows), fHi = npvMonthly(hi, cashflows);
+    for (let i = 0; i < 24 && fLo * fHi > 0; i++) {
+      hi = Math.min(hi * 1.6, 2);
+      fHi = npvMonthly(hi, cashflows);
+    }
+    if (fLo * fHi > 0) return null;
+    for (let i = 0; i < 80; i++) {
+      const mid = (lo + hi) / 2;
+      const f = npvMonthly(mid, cashflows);
+      if (fLo * f <= 0) { hi = mid; fHi = f; }
+      else { lo = mid; fLo = f; }
+    }
+    return (lo + hi) / 2;
+  }
+  function aprCashflows(result) {
+    const loan = result && result.loan;
+    if (!(typeof loan === "number") || loan <= 0) return null;
+    const fees = (result.terms && Number(result.terms.fees)) || 0;
+    const pointsd = Number(result.pointsd) || 0;
+    const ufmid = Number(result.ufmid) || 0;
+    const amountFinanced = loan - pointsd - fees - ufmid;
+    if (amountFinanced <= 0) return null;
+    const balloonYrs = (result.terms && Number(result.terms.balloon)) || 0;
+    const amortYrs = (result.terms && Number(result.terms.amort)) || 0;
+    const nper = Math.round((balloonYrs > 0 ? balloonYrs : amortYrs) * 12);
+    if (nper <= 0 || !result.months || result.months.length < nper) return null;
+    const cfs = new Array(nper + 1);
+    cfs[0] = amountFinanced;
+    for (let t = 1; t <= nper; t++) {
+      const mo = result.months[t - 1];
+      let pay = (mo && (Number(mo.pi) || 0) + (Number(mo.mi) || 0)) || 0;
+      if (balloonYrs > 0 && t === nper) pay += Number(mo.end) || 0;
+      cfs[t] = -pay;
+    }
+    return { amountFinanced, nper, cashflows: cfs, prepaidFinanceCharges: pointsd + fees + ufmid };
+  }
+  function computeApr(result) {
+    const pack = aprCashflows(result);
+    if (!pack) return null;
+    const monthly = solveMonthlyRate(pack.cashflows);
+    if (monthly == null || !isFinite(monthly) || monthly < 0) return null;
+    return monthly * 12; // nominal annual percentage rate
+  }
+  function fmtApr(v) {
+    if (typeof v !== "number" || !isFinite(v)) return "n/a";
+    return (v * 100).toFixed(3) + "%";
+  }
   function kpisFrom(result, s) {
     const rent = result.rent;
     const onePct = (s.price > 0) ? rent / s.price : 0;
@@ -1004,13 +1068,11 @@ footer a:hover{color:#6E2F12}
       {key:"exp", label:"Expense ratio", value: exp, display: fmtPct(exp, 1), rate: rateExpense(exp)}
     ];
   }
-  const API = {LOANS, MAX_UNITS, defaultState, loanById, rentTotal, toEngineInput, computeSnapshot, kpisFrom, fmtUsd, fmtPct, fmtX, bandUsd0, bandRatio, bandX, rateCashFlow, rateCoc, rateCap, rateDscr, rateOnePct, rateExpense};
+  const API = {LOANS, MAX_UNITS, defaultState, loanById, rentTotal, toEngineInput, computeSnapshot, kpisFrom, fmtUsd, fmtPct, fmtX, bandUsd0, bandRatio, bandX, rateCashFlow, rateCoc, rateCap, rateDscr, rateOnePct, rateExpense, computeApr, aprCashflows, solveMonthlyRate, fmtApr};
   if (typeof module !== "undefined" && module.exports) module.exports = API;
   root.RentalSnapshotCore = API;
 })(typeof window !== "undefined" ? window : globalThis);
 
-</script>
-<script>
 (function () {
   "use strict";
   const RA = window.RentalAnalyzer;
@@ -1199,6 +1261,23 @@ footer a:hover{color:#6E2F12}
           state.term + "-year amortization.";
       }
     }
+    const aprEl = $("#example-apr");
+    const apr = (state.loanType === "cash") ? null : C.computeApr(out.result);
+    if (aprEl) {
+      if (apr == null) {
+        if (state.loanType === "cash") {
+          aprEl.hidden = false;
+          aprEl.innerHTML = "<span class=\"apr-value\">Example APR n/a</span> A cash purchase has no loan, so there is no APR.";
+        } else {
+          aprEl.hidden = true;
+          aprEl.innerHTML = "";
+        }
+      } else {
+        aprEl.hidden = false;
+        aprEl.innerHTML = "<span class=\"apr-value\">Example APR " + C.fmtApr(apr) + "</span> " +
+          "This estimate includes the example interest rate, points, lender fees, and any mortgage insurance in the payment stream. It does not include property tax or homeowners insurance. It is an example only — not a quote, not a closing disclosure, and not an advertised credit term.";
+      }
+    }
     const loan = C.loanById(state.loanType);
     const recap = $("#print-recap");
     if (recap) {
@@ -1209,7 +1288,9 @@ footer a:hover{color:#6E2F12}
       recap.innerHTML = "<strong>Snapshot of the numbers used</strong> · Price " + C.fmtUsd(state.price, 0) +
         " · " + state.unitCount + (state.unitCount===1?" unit":" units") +
         " · Rent " + C.fmtUsd(out.rentTotal, 0) + "/mo · " + loan.label + " · " + rateTxt +
-        " · Cash in " + C.fmtUsd(out.result.cashin, 0) + extra + ". Example terms only, not a quote.";
+        " · Cash in " + C.fmtUsd(out.result.cashin, 0) + extra +
+        (apr == null ? (state.loanType === "cash" ? " · Example APR n/a" : "") : (" · Example APR " + C.fmtApr(apr))) +
+        ". Example terms only, not a quote.";
     }
     window.__rentalV2 = Object.assign({state}, out);
     postResize();
@@ -1219,10 +1300,19 @@ footer a:hover{color:#6E2F12}
   function postResize() {
     try {
       if (window.parent === window) return;
-      const height = Math.ceil(Math.max(
-        document.documentElement.scrollHeight,
-        document.body ? document.body.scrollHeight : 0
-      ));
+      // Measure in-flow content, not the document box. A tall parent iframe
+      // (for example a 7,800px starting min-height) would otherwise inflate
+      // scrollHeight and the frame would never shrink on desktop.
+      const body = document.body;
+      let bottom = 0;
+      if (body) {
+        const kids = body.children;
+        for (let i = 0; i < kids.length; i++) {
+          const r = kids[i].getBoundingClientRect();
+          bottom = Math.max(bottom, r.bottom);
+        }
+      }
+      const height = Math.max(1, Math.ceil(bottom + (window.scrollY || window.pageYOffset || 0) + 16));
       window.parent.postMessage({ source: "harbor-rental-snapshot", type: "resize", height: height }, "*");
     } catch (e) {}
   }

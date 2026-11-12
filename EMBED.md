@@ -1,6 +1,6 @@
 # Embedding the Rental Property Snapshot
 
-For Reginald: a suggested iframe for toddrenard.com/rental-calculator. The page is built to sit inside a frame about 360–1200px wide. It does not break out of the frame. Download PDF uses the browser’s print dialog and works in an iframe if the frame is allowed to open dialogs.
+This calculator is built to sit inside an iframe about 360–1200px wide. It does not break out of the frame. **Download PDF** uses the browser’s print dialog and works in an iframe if the frame is allowed to open dialogs.
 
 Published URL: https://nardthefox.github.io/harbor-rental-public/
 
@@ -9,7 +9,7 @@ Published URL: https://nardthefox.github.io/harbor-rental-public/
 ```html
 <iframe
   id="rental-snapshot"
-  title="Rental Property Snapshot | Todd Renard, REALTOR®"
+  title="Rental Property Snapshot"
   src="https://nardthefox.github.io/harbor-rental-public/"
   loading="lazy"
   style="width:100%;max-width:1200px;border:0;min-height:7800px;"
@@ -21,13 +21,16 @@ Published URL: https://nardthefox.github.io/harbor-rental-public/
     if (!data || data.source !== "harbor-rental-snapshot" || data.type !== "resize") return;
     var frame = document.getElementById("rental-snapshot");
     if (frame && typeof data.height === "number" && data.height > 0) {
+      frame.style.minHeight = "0";
       frame.style.height = data.height + "px";
     }
   });
 </script>
 ```
 
-Notes:
+The starting `min-height` avoids a short flash before the first resize message. The handler must set `frame.style.minHeight = "0"` (or set `min-height` to the reported height) **before** setting `height`. If it does not, the 7,800px starting `min-height` wins over a shorter desktop height and leaves a large blank gap below the page.
+
+## Sandbox notes
 
 - `allow-scripts` is required for the calculator to run.
 - `allow-same-origin` lets **Clear my data** and optional saving use `localStorage` on the framed origin (the calculator’s own origin, not the parent page). Saved numbers never leave the visitor’s device.
@@ -37,10 +40,10 @@ Notes:
 
 ## Recommended height
 
-The iframe posts its content height whenever the layout changes, so a large `min-height` is only a starting point (to avoid a short flash before the first message). Measured on the default example figures:
+The iframe posts its content height whenever the layout changes. Measured on the default example figures (More detail closed):
 
-- **Mobile (about 390px wide):** about **7,600px** tall for the default example (More detail closed). Use a starting `min-height` of **7,800px**.
-- **Desktop (about 1,200–1,280px wide, two-column layout):** about **4,400px** tall for the same default example. Use a starting `min-height` of **4,500px** if you serve a desktop-only starting height. For a single snippet that also works on phones before the first resize message, prefer the mobile starting height (**7,800px**) as in the example above.
+- **Mobile (about 390px wide):** about **7,800px** tall (7,759px measured on the default example, including the Example APR line). Use a starting `min-height` of **7,800px**.
+- **Desktop (about 1,200–1,280px wide, two-column layout):** about **4,600px** tall (4,556px measured on the same default example). Use a starting `min-height` of **4,700px** only if you serve a desktop-only starting height. For a single snippet that also works on phones before the first resize message, prefer the mobile starting height (**7,800px**) as in the example above, and rely on the handler to clear `min-height`.
 
 If the visitor opens “More detail,” adds many unit rows, or a balloon notice appears, the posted height will grow and the script above will stretch the frame. If `postMessage` is unavailable, use the mobile starting height so the page is not clipped on a phone.
 
