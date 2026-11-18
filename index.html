@@ -1042,14 +1042,16 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
       rate: s.loanType === "cash" ? 0 : Number(s.rate),
       amort: Number(s.term) || 30,
       io: 0, armfix: 0, armrate: 0,
-      balloon: (s.loanType === "cash" ? 0 : (Number(s.balloon) || 0))
+      balloon: (s.loanType === "cash" ? 0 : (Number(s.balloon) || 0)),
+      points: 0,
+      fees: 0
     };
     if (s.loanType === "conventional" && Number(s.down) < 0.20) {
       overrides.mi = 0.0075;
       overrides.miltv = 0.78;
     }
     if (s.loanType === "cash") {
-      overrides.points = 0; overrides.fees = 0; overrides.mi = 0; overrides.ufmi = 0; overrides.owner = 0;
+      overrides.mi = 0; overrides.ufmi = 0; overrides.owner = 0;
     }
     const mc = Number(s.maintCapexPct) || 0;
     return Object.assign(RA.cloneDefaults(), {
@@ -1910,7 +1912,7 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
     const pending = !!out.pendingLoan;
     const feesNote = state.loanType === "cash"
       ? "Cash invested is the price plus closing costs and any upfront rehab / CapEx."
-      : "Cash invested includes the down payment, closing costs, any upfront rehab / CapEx, and typical points and lender fees used in this estimate (not a quote). The ongoing monthly maintenance + CapEx reserve is a separate operating cost, not added here.";
+      : "Cash invested includes the down payment, closing costs, and any upfront rehab / CapEx. Lender points and fees are not included; get them from your lender. The ongoing monthly maintenance + CapEx reserve is a separate operating cost, not added here.";
     const rehabBit = state.rehab > 0 ? " Upfront rehab / CapEx of " + C.fmtUsd(state.rehab, 0) + " is included." : "";
     if (pending) {
       $("#cash-line").textContent = "Cash you put in: Enter loan terms." + (state.rehab > 0 ? rehabBit : "") + " " + feesNote;
@@ -1950,7 +1952,7 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
       } else {
         aprEl.hidden = false;
         aprEl.innerHTML = "<span class=\"apr-value\">Example APR " + C.fmtApr(apr) + "</span> " +
-          "This estimate includes the interest rate you entered, plus points, lender fees, and any mortgage insurance in the payment stream. It does not include property tax or homeowners insurance. It is an estimate only — not a quote, not a closing disclosure, and not an advertised credit term.";
+          "This estimate includes the interest rate you entered, plus any mortgage insurance in the payment stream. Lender points and fees are not included. It does not include property tax or homeowners insurance. It is an estimate only — not a quote, not a closing disclosure, and not an advertised credit term.";
       }
     }
     const loan = C.loanById(state.loanType);
