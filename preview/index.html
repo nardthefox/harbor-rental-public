@@ -215,10 +215,7 @@ html.fit-mobile .example-bar{margin:0 0 8px}
 .hold-chart{position:relative;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
 .hc-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 8px;margin:0 0 6px}
 .hc-head h3{margin:0}
-.hc-toggle{display:flex;gap:4px}
-.hc-toggle button{font:inherit;font-size:12px;font-weight:700;min-width:44px;min-height:26px;padding:2px 8px;border:1px solid var(--line-d);border-radius:6px;background:#fff;color:var(--ink);cursor:pointer}
-.hc-toggle button[aria-pressed="true"]{background:var(--rust-d);border-color:var(--rust-d);color:#fff}
-.hc-toggle button:focus-visible,.hc-slider input:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+.hc-slider input:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
 .hc-whatif{display:grid;grid-template-columns:1fr 1fr;gap:2px 14px;margin:0 0 4px;padding:0;border:0;min-width:0}
 .hc-slider{display:flex;flex-direction:column;gap:0;margin:0;font-size:12.5px;color:var(--ink);min-width:0}
 .hc-slider .hc-sl-label{display:flex;justify-content:space-between;gap:6px;font-weight:650}
@@ -253,7 +250,6 @@ html.fit-mobile .example-bar{margin:0 0 8px}
 html.fit-mobile .hold-chart{margin-top:6px;padding-top:6px}
 html.fit-mobile .hc-head{margin:0 0 2px}
 html.fit-mobile .hc-head h3{font-size:15px;line-height:1.3}
-html.fit-mobile .hc-toggle button{font-size:11.5px;min-width:38px;min-height:24px;padding:1px 6px}
 html.fit-mobile .hc-whatif{gap:0 10px;margin:0 0 2px}
 html.fit-mobile .hc-slider{font-size:11.5px;line-height:1.3}
 html.fit-mobile .hc-slider input[type=range]{height:18px}
@@ -272,7 +268,7 @@ html.fit-mobile .kpi .mean,html.fit-mobile .kpi .bench{line-height:1.35}
 html.fit-desktop #inputs .field{margin-bottom:8px}
 @media print{
   .hold-chart{break-inside:avoid;margin-top:8px;padding-top:8px}
-  .hold-chart-placeholder,.example-bar,.hc-toggle,.hc-whatif,.hc-tip{display:none !important}
+  .hold-chart-placeholder,.example-bar,.hc-whatif,.hc-tip{display:none !important}
   .hc-anim .hc-grow{animation:none !important}
 }
 /* v4.3 desktop: keep the example select inline beside its label (width fix must not add a desktop line) */
@@ -430,11 +426,6 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
         <section class="hold-chart" id="hold-chart" aria-labelledby="hold-chart-h">
           <div class="hc-head">
             <h3 id="hold-chart-h">Wealth by year</h3>
-            <div class="hc-toggle" id="hc-toggle" role="group" aria-label="Years to show" hidden>
-              <button type="button" data-years="5" aria-pressed="false" aria-label="Show 5 years">5 yr</button>
-              <button type="button" data-years="10" aria-pressed="true" aria-label="Show 10 years">10 yr</button>
-              <button type="button" data-years="30" aria-pressed="false" aria-label="Show 30 years">30 yr</button>
-            </div>
           </div>
           <fieldset class="hc-whatif" id="hc-whatif" hidden>
             <legend class="sr-only">What-if sliders. They change this chart only, not your results above.</legend>
@@ -1516,14 +1507,11 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
      - Loan paydown = original loan minus the scheduled balance at the end of each year (standard
        amortization of the visitor's own terms). Years past the term have no payment (the engine's
        schedule pays nothing after the last month), so cash flow rises and the balance stays 0.
-     - Balloon: if the visitor entered one and it falls inside the view, the chart keeps going past
-       it and marks the balloon year with a dashed line. Later years assume the balance due is
-       refinanced at the same rate over the remaining amortization, which is the same as the
-       engine's schedule simply continuing (same payment, same paydown). Illustrative only: real
-       refinance terms are not guaranteed, and the chart note says so.
+     - Balloon: if the visitor entered one, the chart stops at the balloon year, because the
+       remaining balance is due then and refinance terms are unknown.
      - Appreciation equity = projected value minus the starting value at the slider rate.
      - Cash flow so far = the engine's yearly cash flow (rent grown by the slider), summed. */
-  const CHART = {years: 10, rent: null, appr: null, pageAppr: undefined, lastOut: null,
+  const CHART = {years: 5, rent: null, appr: null, pageAppr: undefined, lastOut: null,
     animate: true, wasPending: true, active: -1, pinned: false, width: 0, rows: [], geo: null};
   const CHART_COLORS = {
     cf: {stroke:"#215E2C", soft:"#D3E6D6", label:"Cash flow so far"},
@@ -1610,8 +1598,8 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
     const loan0 = isCash ? 0 : (Number(res.loan) || 0);
     const basis = Number(res.valueBasis) || Number(state.price) || 0;
     const balloonYrs = (!isCash && loan0 > 0) ? (Number(state.balloon) || 0) : 0;
-    const n = CHART.years;
-    const balloonYr = (balloonYrs > 0 && balloonYrs < n) ? balloonYrs : 0;
+    let n = CHART.years, balloonCap = 0;
+    if (balloonYrs > 0 && balloonYrs < n) { n = balloonYrs; balloonCap = balloonYrs; }
     const rows = [];
     let allCovered = true;
     for (let i = 0; i < n; i++) {
@@ -1624,14 +1612,14 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
       const cf = Number(p.cum_cf || 0);
       rows.push({year: i + 1, cf: cf, paydown: paydown, appr: appr, total: cf + paydown + appr, yearCf: yearCf, tenantsPaid: allCovered && paydown > 0});
     }
-    return {rows: rows, rg: rg, ap: ap, balloonYr: balloonYr, loan0: loan0};
+    return {rows: rows, rg: rg, ap: ap, balloonCap: balloonCap, loan0: loan0};
   }
 
   function chartNotes(d) {
     const rows = d.rows, notes = [];
     if (!rows.length) return notes;
     const first = rows[0], last = rows[rows.length - 1];
-    if (d.balloonYr) notes.push({cls:"n-neg", text:"Balloon due in year " + d.balloonYr + "; later years assume a same-rate refi (not guaranteed)."});
+    if (d.balloonCap) notes.push({cls:"n-neg", text:"Balloon due in year " + d.balloonCap + "; the chart stops there."});
     if (rows.some(function (r) { return r.cf < 0 || r.appr < 0; })) {
       notes.push({cls:"n-neg", text:"Bars below the line: more went out than came in so far."});
     }
@@ -1736,10 +1724,6 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
         "<rect class=\"hc-hit\" x=\"" + (pl + band * i).toFixed(1) + "\" y=\"" + pt + "\" width=\"" + band.toFixed(1) + "\" height=\"" + ih.toFixed(1) + "\" rx=\"3\"/>" +
         "<g class=\"hc-grow\" style=\"transform-origin:0px " + zeroY.toFixed(1) + "px;animation-delay:" + (i * stagger) + "ms\">" + segs + "</g></g>";
     });
-    if (d.balloonYr) {
-      const bx = (pl + band * d.balloonYr).toFixed(1);
-      svg += "<line class=\"hc-balloon\" x1=\"" + bx + "\" x2=\"" + bx + "\" y1=\"" + pt + "\" y2=\"" + (pt + ih).toFixed(1) + "\" stroke=\"#7A3E12\" stroke-width=\"1.25\" stroke-dasharray=\"3 3\" pointer-events=\"none\" aria-hidden=\"true\"/>";
-    }
     svg += "<line x1=\"" + pl + "\" x2=\"" + (W - pr) + "\" y1=\"" + zeroY.toFixed(1) + "\" y2=\"" + zeroY.toFixed(1) + "\" stroke=\"#2B2420\" stroke-width=\"1.25\" aria-hidden=\"true\"/>";
     svg += "</svg>";
     CHART.geo = geo;
@@ -1820,8 +1804,7 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
     syncChartSlider("hc-rent", chartRentRate(out), CHART.rent != null);
     syncChartSlider("hc-appr", chartApprRate(), CHART.appr != null);
     const pending = chartPending(out);
-    const tg = $("#hc-toggle"), wi = $("#hc-whatif");
-    if (tg) tg.hidden = pending;
+    const wi = $("#hc-whatif");
     if (wi) wi.hidden = pending;
     const wn = $("#hc-whatif-note");
     if (wn) wn.hidden = pending;
@@ -1837,32 +1820,17 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
     drawHoldChart(out);
   }
 
-  // Clear my data: back to the 10-year view, and the what-if sliders follow the page again.
+  // Clear my data: the what-if sliders follow the page again. The chart always shows 5 years.
   function resetHoldChartView() {
-    CHART.years = 10;
     CHART.rent = null;
     CHART.appr = null;
     CHART.active = -1;
     CHART.animate = true;
     hideChartTip();
-    $$("#hc-toggle button[data-years]").forEach(function (x) { x.setAttribute("aria-pressed", x.getAttribute("data-years") === "10" ? "true" : "false"); });
   }
 
   function initHoldChart() {
     const body = $("#hold-chart-body");
-    const tg = $("#hc-toggle");
-    if (tg) {
-      tg.addEventListener("click", function (ev) {
-        const b = ev.target.closest("button[data-years]");
-        if (!b) return;
-        CHART.years = Number(b.getAttribute("data-years")) || 10;
-        $$("button[data-years]", tg).forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
-        CHART.animate = true;
-        hideChartTip();
-        CHART.active = -1;
-        if (CHART.lastOut && !chartPending(CHART.lastOut)) drawHoldChart(CHART.lastOut);
-      });
-    }
     [["hc-rent", "rent"], ["hc-appr", "appr"]].forEach(function (pair) {
       const el = $("#" + pair[0]);
       if (!el) return;
