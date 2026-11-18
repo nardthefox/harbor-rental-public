@@ -5,9 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script>
 (function () {
+  var framed;
+  try { framed = window.self !== window.top; } catch (e) { framed = true; }
+  if (!framed) return;
   function applyFitZoom() {
     var w = window.innerWidth;
-    var z = w >= 600 ? w / 956 : w / 342;
+    var z = w >= 600 ? w / 975 : w / 342;
     var root = document.documentElement;
     root.style.zoom = String(z);
     if (w >= 600) {
@@ -82,7 +85,7 @@ main{padding:18px 0 8px}
 .lede{margin:0 0 16px;color:var(--muted);max-width:40rem}
 .grid-page{display:grid;gap:16px}
 @media (min-width:900px){.grid-page{grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);align-items:start}}
-/* Layout follows the zoom design width (956 desktop / 342 mobile), not the iframe viewport. */
+/* Layout follows the zoom design width (975 desktop / 342 mobile), not the iframe viewport. */
 html.fit-desktop .grid-page{grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);align-items:start}
 html.fit-desktop .row-2{grid-template-columns:1fr 1fr}
 html.fit-desktop .row-3,html.fit-desktop .grid-page .row-3{grid-template-columns:repeat(3,minmax(0,1fr))}
