@@ -1516,8 +1516,11 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
      - Loan paydown = original loan minus the scheduled balance at the end of each year (standard
        amortization of the visitor's own terms). Years past the term have no payment (the engine's
        schedule pays nothing after the last month), so cash flow rises and the balance stays 0.
-     - Balloon: if the visitor entered one, the chart stops at the balloon year, because the
-       remaining balance is due then and refinance terms are unknown.
+     - Balloon: if the visitor entered one and it falls inside the view, the chart keeps going past
+       it and marks the balloon year with a dashed line. Later years assume the balance due is
+       refinanced at the same rate over the remaining amortization, which is the same as the
+       engine's schedule simply continuing (same payment, same paydown). Illustrative only: real
+       refinance terms are not guaranteed, and the chart note says so.
      - Appreciation equity = projected value minus the starting value at the slider rate.
      - Cash flow so far = the engine's yearly cash flow (rent grown by the slider), summed. */
   const CHART = {years: 10, rent: null, appr: null, pageAppr: undefined, lastOut: null,
@@ -1607,8 +1610,8 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
     const loan0 = isCash ? 0 : (Number(res.loan) || 0);
     const basis = Number(res.valueBasis) || Number(state.price) || 0;
     const balloonYrs = (!isCash && loan0 > 0) ? (Number(state.balloon) || 0) : 0;
-    let n = CHART.years, balloonCap = 0;
-    if (balloonYrs > 0 && balloonYrs < n) { n = balloonYrs; balloonCap = balloonYrs; }
+    const n = CHART.years;
+    const balloonYr = (balloonYrs > 0 && balloonYrs < n) ? balloonYrs : 0;
     const rows = [];
     let allCovered = true;
     for (let i = 0; i < n; i++) {
@@ -1621,14 +1624,14 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
       const cf = Number(p.cum_cf || 0);
       rows.push({year: i + 1, cf: cf, paydown: paydown, appr: appr, total: cf + paydown + appr, yearCf: yearCf, tenantsPaid: allCovered && paydown > 0});
     }
-    return {rows: rows, rg: rg, ap: ap, balloonCap: balloonCap, loan0: loan0};
+    return {rows: rows, rg: rg, ap: ap, balloonYr: balloonYr, loan0: loan0};
   }
 
   function chartNotes(d) {
     const rows = d.rows, notes = [];
     if (!rows.length) return notes;
     const first = rows[0], last = rows[rows.length - 1];
-    if (d.balloonCap) notes.push({cls:"n-neg", text:"Balloon due in year " + d.balloonCap + "; the chart stops there."});
+    if (d.balloonYr) notes.push({cls:"n-neg", text:"Balloon due in year " + d.balloonYr + "; later years assume a same-rate refi (not guaranteed)."});
     if (rows.some(function (r) { return r.cf < 0 || r.appr < 0; })) {
       notes.push({cls:"n-neg", text:"Bars below the line: more went out than came in so far."});
     }
@@ -1733,6 +1736,10 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
         "<rect class=\"hc-hit\" x=\"" + (pl + band * i).toFixed(1) + "\" y=\"" + pt + "\" width=\"" + band.toFixed(1) + "\" height=\"" + ih.toFixed(1) + "\" rx=\"3\"/>" +
         "<g class=\"hc-grow\" style=\"transform-origin:0px " + zeroY.toFixed(1) + "px;animation-delay:" + (i * stagger) + "ms\">" + segs + "</g></g>";
     });
+    if (d.balloonYr) {
+      const bx = (pl + band * d.balloonYr).toFixed(1);
+      svg += "<line class=\"hc-balloon\" x1=\"" + bx + "\" x2=\"" + bx + "\" y1=\"" + pt + "\" y2=\"" + (pt + ih).toFixed(1) + "\" stroke=\"#7A3E12\" stroke-width=\"1.25\" stroke-dasharray=\"3 3\" pointer-events=\"none\" aria-hidden=\"true\"/>";
+    }
     svg += "<line x1=\"" + pl + "\" x2=\"" + (W - pr) + "\" y1=\"" + zeroY.toFixed(1) + "\" y2=\"" + zeroY.toFixed(1) + "\" stroke=\"#2B2420\" stroke-width=\"1.25\" aria-hidden=\"true\"/>";
     svg += "</svg>";
     CHART.geo = geo;
