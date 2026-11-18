@@ -3,6 +3,29 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+(function () {
+  var framed;
+  try { framed = window.self !== window.top; } catch (e) { framed = true; }
+  if (!framed) return;
+  function applyFitZoom() {
+    var w = window.innerWidth;
+    var z = w >= 600 ? w / 975 : w / 342;
+    var root = document.documentElement;
+    root.style.zoom = String(z);
+    if (w >= 600) {
+      root.classList.add("fit-desktop");
+      root.classList.remove("fit-mobile");
+    } else {
+      root.classList.add("fit-mobile");
+      root.classList.remove("fit-desktop");
+    }
+  }
+  applyFitZoom();
+  window.addEventListener("resize", applyFitZoom);
+  window.addEventListener("orientationchange", applyFitZoom);
+})();
+</script>
 <title>Rental Property Snapshot | Todd Renard, REALTOR®</title>
 <meta name="description" content="Estimates only. A short, private rental-property snapshot from Todd Renard, REALTOR®, Harbor Realty and Management Group. Not a rate quote, loan approval, tax or financial advice.">
 <meta name="robots" content="noindex, nofollow">
@@ -62,6 +85,14 @@ main{padding:18px 0 8px}
 .lede{margin:0 0 16px;color:var(--muted);max-width:40rem}
 .grid-page{display:grid;gap:16px}
 @media (min-width:900px){.grid-page{grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);align-items:start}}
+/* Layout follows the zoom design width (975 desktop / 342 mobile), not the iframe viewport. */
+html.fit-desktop .grid-page{grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);align-items:start}
+html.fit-desktop .row-2{grid-template-columns:1fr 1fr}
+html.fit-desktop .row-3,html.fit-desktop .grid-page .row-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+html.fit-desktop .row-4{grid-template-columns:repeat(4,1fr)}
+html.fit-desktop .kpis{grid-template-columns:1fr 1fr}
+html.fit-mobile .grid-page{grid-template-columns:none;align-items:initial}
+html.fit-mobile .row-2,html.fit-mobile .row-3,html.fit-mobile .row-4,html.fit-mobile .grid-page .row-3,html.fit-mobile .kpis{grid-template-columns:none}
 .card{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--rust);border-radius:var(--radius);padding:18px 16px;box-shadow:var(--shadow)}
 h2{font-family:var(--font-display);font-size:clamp(20px,2.6vw,24px);margin:0 0 6px;color:var(--navy)}
 h3{font-family:var(--font-display);font-size:17px;margin:16px 0 8px;color:var(--navy)}
@@ -140,6 +171,7 @@ footer a:hover{color:#6E2F12}
 .print-only{display:none}
 .print-recap{display:none}
 @media print{
+  html{zoom:1 !important}
   :root{print-color-adjust:exact;-webkit-print-color-adjust:exact}
   @page{size:letter;margin:.5in}
   body{background:#fff;font-size:11px;line-height:1.3}
