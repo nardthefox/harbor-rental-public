@@ -337,7 +337,7 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
             <option value="c">Rental C, Rochester single-family</option>
           </select>
         </label>
-        <p class="example-note">Todd's own rentals, past results, not a promise.</p>
+        <p class="example-note">Todd's own rentals and loans, past results, not a promise.</p>
       </div>
 
       <label class="field">Purchase price
@@ -1434,9 +1434,9 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
 
 
   const EXAMPLES = {
-    a: {price:185000, unitCount:1, rents:[2200], propTax:2400, insurance:1417, vacancy:0, maintCapexPct:0, mgmtPct:0, otherMonthly:0, otherInc:0, closingCosts:0, rehab:40000},
-    b: {price:197000, unitCount:1, rents:[2050], propTax:2400, insurance:950, vacancy:0, maintCapexPct:0, mgmtPct:0, otherMonthly:0, otherInc:0, closingCosts:0, rehab:40000},
-    c: {price:235000, unitCount:1, rents:[2224], propTax:2400, insurance:1417, vacancy:0, maintCapexPct:0, mgmtPct:0, otherMonthly:0, otherInc:0, closingCosts:0, rehab:20000}
+    a: {down:0.20, rate:0.0725, term:30, balloon:5, price:185000, unitCount:1, rents:[2200], propTax:2400, insurance:1417, vacancy:0, maintCapexPct:0, mgmtPct:0, otherMonthly:0, otherInc:0, closingCosts:0, rehab:40000},
+    b: {down:0.20, rate:0.065, term:30, balloon:5, price:197000, unitCount:1, rents:[2050], propTax:2400, insurance:950, vacancy:0, maintCapexPct:0, mgmtPct:0, otherMonthly:0, otherInc:0, closingCosts:0, rehab:40000},
+    c: {down:0.20, rate:0.075, term:30, balloon:5, price:235000, unitCount:1, rents:[2224], propTax:2400, insurance:1417, vacancy:0, maintCapexPct:0, mgmtPct:0, otherMonthly:0, otherInc:0, closingCosts:0, rehab:20000}
   };
 
   function setExampleSelect(val) {
@@ -1459,17 +1459,17 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
     state.otherInc = ex.otherInc;
     state.closingCosts = ex.closingCosts;
     state.rehab = ex.rehab;
-    state.down = "";
-    state.rate = "";
-    state.term = "";
-    state.balloon = 0;
+    state.down = ex.down;
+    state.rate = ex.rate;
+    state.term = ex.term;
+    state.balloon = ex.balloon;
     state.loanType = C.defaultState().loanType;
     fillSegs();
     fillInputs();
     recalc();
     persist();
     const el = $("#save-msg");
-    if (el) el.textContent = "Example loaded. Enter your own loan terms to see financed results. Saved on this device only. Nothing is sent anywhere.";
+    if (el) el.textContent = "Example loaded with Todd's own past loan terms (30-year amortization estimated). Not a current rate or offer of credit. Saved on this device only.";
   }
 
   /* ---- Stacked yearly wealth chart (preview v4) ----
