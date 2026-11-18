@@ -1437,9 +1437,9 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
 
 
   const EXAMPLES = {
-    a: {down:0.20, rate:0.0725, term:25, balloon:5, price:185000, unitCount:1, rents:[2200], propTax:2400, insurance:1417, vacancy:0, maintCapexPct:0, mgmtPct:0, otherMonthly:0, otherInc:0, closingCosts:0, rehab:40000},
-    b: {down:0.20, rate:0.065, term:25, balloon:5, price:197000, unitCount:1, rents:[2050], propTax:2400, insurance:950, vacancy:0, maintCapexPct:0, mgmtPct:0, otherMonthly:0, otherInc:0, closingCosts:0, rehab:40000},
-    c: {down:0.20, rate:0.075, term:25, balloon:5, price:235000, unitCount:1, rents:[2224], propTax:2400, insurance:1417, vacancy:0, maintCapexPct:0, mgmtPct:0, otherMonthly:0, otherInc:0, closingCosts:0, rehab:20000}
+    a: {down:0.20, rate:0.0725, term:25, balloon:5, price:185000, unitCount:1, rents:[2200], propTax:3354, insurance:915, vacancy:0, maintCapexPct:0, mgmtPct:0, otherMonthly:0, otherInc:0, closingCosts:0, rehab:40000},
+    b: {down:0.20, rate:0.065, term:25, balloon:5, price:197000, unitCount:1, rents:[2050], propTax:2892, insurance:915, vacancy:0, maintCapexPct:0, mgmtPct:0, otherMonthly:0, otherInc:0, closingCosts:0, rehab:40000},
+    c: {down:0.20, rate:0.075, term:25, balloon:5, price:235000, unitCount:1, rents:[2224], propTax:3218, insurance:915, vacancy:0, maintCapexPct:0, mgmtPct:0, otherMonthly:0, otherInc:0, closingCosts:0, rehab:20000}
   };
 
   function renderExTerms(out) {
@@ -1454,9 +1454,14 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
       el.hidden = true; el.textContent = ""; return;
     }
     const usd2 = v => "$" + Number(v).toLocaleString("en-US", {minimumFractionDigits:2, maximumFractionDigits:2});
+    const piti = r.pi + (r.mim || 0) + r.taxm + r.insm;
+    const taxNote = same(state.propTax, ex.propTax) ? " (2026 Olmsted County)" : "";
+    const insNote = same(state.insurance, ex.insurance) ? " (estimate)" : "";
     el.textContent = "Todd's real-world past loan: " + C.fmtPct(ex.down, 0) + " down, " + (ex.balloon * 12) + " monthly payments of " + usd2(r.pi) +
-      " principal and interest (" + ex.term + "-yr amortization), then a balloon of about " + usd2(r.balloond) + ". Estimated APR " + C.fmtApr(C.computeApr(r)) + ". " +
-      "Payments don't include property taxes or insurance; the actual payment will be higher. Not a current rate or offer of credit.";
+      " principal and interest (" + ex.term + "-yr amortization), plus optional line items: property tax " + usd2(r.taxm) + "/mo" + taxNote +
+      " and insurance " + usd2(r.insm) + "/mo" + insNote + ". Total monthly payment (PITI) about " + usd2(piti) +
+      ", then a balloon of about " + usd2(r.balloond) + ". Estimated APR " + C.fmtApr(C.computeApr(r)) + ", which excludes taxes and insurance; both fields are editable. " +
+      "Not a current rate or offer of credit.";
     el.hidden = false;
   }
 
