@@ -10,7 +10,7 @@
   if (!framed) return;
   function applyFitZoom() {
     var w = window.innerWidth;
-    var z = w >= 600 ? w / 975 : w / 342;
+    var z = w >= 600 ? w / 1000 : w / 342;
     var root = document.documentElement;
     root.style.zoom = String(z);
     if (w >= 600) {
@@ -85,7 +85,7 @@ main{padding:18px 0 8px}
 .lede{margin:0 0 16px;color:var(--muted);max-width:40rem}
 .grid-page{display:grid;gap:16px}
 @media (min-width:900px){.grid-page{grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);align-items:start}}
-/* Layout follows the zoom design width (975 desktop / 342 mobile), not the iframe viewport. */
+/* Layout follows the zoom design width (1000 desktop / 342 mobile), not the iframe viewport. */
 html.fit-desktop .grid-page{grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);align-items:start}
 html.fit-desktop .row-2{grid-template-columns:1fr 1fr}
 html.fit-desktop .row-3,html.fit-desktop .grid-page .row-3{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -1347,9 +1347,9 @@ html.fit-mobile .hold-chart-summary,html.fit-mobile .hold-chart-caption{font-siz
 
   const CHART_YEARS = 5;
   const EXAMPLES = {
-    a: {price:185000, unitCount:1, rents:[2200], propTax:2400, insurance:1400, vacancy:0.06, maintCapexPct:0.10, mgmtPct:0.08, otherMonthly:0, rehab:40000},
-    b: {price:195000, unitCount:1, rents:[2050], propTax:2400, insurance:1000, vacancy:0.06, maintCapexPct:0.10, mgmtPct:0.08, otherMonthly:0, rehab:40000},
-    c: {price:235000, unitCount:1, rents:[2225], propTax:2400, insurance:1400, vacancy:0.06, maintCapexPct:0.10, mgmtPct:0.08, otherMonthly:0, rehab:20000}
+    a: {price:185000, unitCount:1, rents:[2200], propTax:2400, insurance:1400, vacancy:0, maintCapexPct:0, mgmtPct:0, otherMonthly:0, rehab:40000},
+    b: {price:195000, unitCount:1, rents:[2050], propTax:2400, insurance:1000, vacancy:0, maintCapexPct:0, mgmtPct:0, otherMonthly:0, rehab:40000},
+    c: {price:235000, unitCount:1, rents:[2224], propTax:2400, insurance:1400, vacancy:0, maintCapexPct:0, mgmtPct:0, otherMonthly:0, rehab:20000}
   };
 
   function setExampleSelect(val) {
