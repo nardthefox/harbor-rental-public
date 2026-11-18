@@ -10,7 +10,7 @@
   if (!framed) return;
   function applyFitZoom() {
     var w = window.innerWidth;
-    var z = w >= 600 ? w / 975 : w / 342;
+    var z = w >= 600 ? w / 1000 : w / 342;
     var root = document.documentElement;
     root.style.zoom = String(z);
     if (w >= 600) {
@@ -85,7 +85,7 @@ main{padding:18px 0 8px}
 .lede{margin:0 0 16px;color:var(--muted);max-width:40rem}
 .grid-page{display:grid;gap:16px}
 @media (min-width:900px){.grid-page{grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);align-items:start}}
-/* Layout follows the zoom design width (975 desktop / 342 mobile), not the iframe viewport. */
+/* Layout follows the zoom design width (1000 desktop / 342 mobile), not the iframe viewport. */
 html.fit-desktop .grid-page{grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);align-items:start}
 html.fit-desktop .row-2{grid-template-columns:1fr 1fr}
 html.fit-desktop .row-3,html.fit-desktop .grid-page .row-3{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -202,6 +202,76 @@ footer a:hover{color:#6E2F12}
   .print-only{display:block}
   footer{padding-top:6px}
 }
+
+/* Preview only: example selector + stacked yearly wealth chart (v4) */
+.example-bar{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin:0 0 10px;min-width:0}
+.example-bar .example-label{display:flex;align-items:center;gap:6px;margin:0;font-size:13px;font-weight:650;color:var(--ink);white-space:nowrap;min-width:0;flex:1 1 100%}
+.example-bar select{flex:1 1 12rem;width:auto;min-width:0;min-height:36px;padding:6px 8px;font-size:13px}
+.example-note{margin:0;font-size:11.5px;line-height:1.25;color:var(--muted);flex:1 1 100%}
+html.fit-mobile .example-bar{margin:0 0 8px}
+.sr-only{position:absolute !important;width:1px !important;height:1px !important;padding:0 !important;margin:-1px !important;overflow:hidden !important;clip:rect(0 0 0 0) !important;white-space:nowrap !important;border:0 !important}
+.hold-chart{position:relative;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.hc-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 8px;margin:0 0 6px}
+.hc-head h3{margin:0}
+.hc-toggle{display:flex;gap:4px}
+.hc-toggle button{font:inherit;font-size:12px;font-weight:700;min-width:44px;min-height:26px;padding:2px 8px;border:1px solid var(--line-d);border-radius:6px;background:#fff;color:var(--ink);cursor:pointer}
+.hc-toggle button[aria-pressed="true"]{background:var(--rust-d);border-color:var(--rust-d);color:#fff}
+.hc-toggle button:focus-visible,.hc-slider input:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+.hc-whatif{display:grid;grid-template-columns:1fr 1fr;gap:2px 14px;margin:0 0 4px;padding:0;border:0;min-width:0}
+.hc-slider{display:flex;flex-direction:column;gap:0;margin:0;font-size:12.5px;color:var(--ink);min-width:0}
+.hc-slider .hc-sl-label{display:flex;justify-content:space-between;gap:6px;font-weight:650}
+.hc-slider output{font-weight:700;color:var(--rust-d);white-space:nowrap}
+.hc-slider input[type=range]{width:100%;margin:0;height:22px;accent-color:var(--rust-d);background:transparent;padding:0;border:0;min-height:0}
+.hc-plot{position:relative}
+.hold-chart-placeholder{background:var(--inset);border:1px dashed var(--line-d);border-radius:8px;padding:18px 14px;color:var(--muted);font-size:14px;font-weight:650;text-align:center}
+.hold-chart-svg{width:100%;height:auto;display:block;overflow:visible}
+.hc-bar{cursor:pointer;outline:none}
+.hc-bar .hc-hit{fill:transparent;stroke:none}
+.hc-bar.is-active .hc-hit,.hc-bar:hover .hc-hit{fill:rgba(43,36,32,.06)}
+.hc-bar:focus-visible .hc-hit{fill:rgba(43,36,32,.06);stroke:#2B2420;stroke-width:1.5}
+.hc-grow{transform-box:view-box}
+.hc-anim .hc-grow{animation:hcGrow .55s cubic-bezier(.2,.7,.3,1) both}
+@keyframes hcGrow{from{transform:scaleY(0);opacity:.2}to{transform:scaleY(1);opacity:1}}
+@media (prefers-reduced-motion: reduce){
+  .hc-anim .hc-grow{animation:none !important}
+}
+.hc-tip{position:absolute;z-index:3;width:max-content;max-width:210px;padding:6px 8px;background:#2B2420;color:#fff;border-radius:6px;font-size:12px;line-height:1.35;box-shadow:0 4px 12px rgba(43,36,32,.25);pointer-events:none}
+.hc-tip strong{color:#fff}
+.hold-chart-legend{display:flex;flex-wrap:wrap;gap:4px 12px;margin:4px 0 0;padding:0;list-style:none;font-size:12px;color:var(--ink)}
+.hold-chart-legend li{display:flex;align-items:center;gap:5px}
+.hold-chart-swatch{width:16px;height:12px;flex:0 0 16px;display:inline-block}
+.hc-notes{margin:4px 0 0;padding:0;list-style:none;font-size:12.5px;line-height:1.35;color:var(--ink)}
+.hc-notes li{margin:2px 0 0;padding-left:8px;border-left:3px solid var(--line-d)}
+.hc-notes li.n-paydown{border-left-color:#A0522D}
+.hc-notes li.n-cf{border-left-color:#215E2C}
+.hc-notes li.n-neg{border-left-color:#7A3E12}
+.hc-notes li.n-appr{border-left-color:#2B2420}
+.hold-chart-caption{margin:4px 0 0;font-size:12px;color:var(--muted);line-height:1.35}
+/* v4.1 mobile headroom: spacing/type only, no content removed */
+html.fit-mobile .hold-chart{margin-top:6px;padding-top:6px}
+html.fit-mobile .hc-head{margin:0 0 2px}
+html.fit-mobile .hc-head h3{font-size:15px;line-height:1.3}
+html.fit-mobile .hc-toggle button{font-size:11.5px;min-width:38px;min-height:24px;padding:1px 6px}
+html.fit-mobile .hc-whatif{gap:0 10px;margin:0 0 2px}
+html.fit-mobile .hc-slider{font-size:11.5px;line-height:1.3}
+html.fit-mobile .hc-slider input[type=range]{height:18px}
+html.fit-mobile .hold-chart-placeholder{padding:10px 8px;font-size:13px}
+html.fit-mobile .hold-chart-legend{font-size:10.5px;line-height:1.25;gap:1px 8px;margin-top:2px}
+html.fit-mobile .hold-chart-legend .hold-chart-swatch{width:13px;height:10px;flex-basis:13px}
+html.fit-mobile .hc-notes{font-size:11px;line-height:1.3;margin-top:2px}
+html.fit-mobile .hc-notes li{display:inline;margin:0 4px 0 0;padding-left:5px}
+html.fit-mobile .hold-chart-caption{font-size:11px;line-height:1.3;margin-top:2px}
+html.fit-mobile .deal-flag{font-size:12.5px;line-height:1.35;padding:7px 10px;margin:0 0 8px}
+html.fit-mobile .kpis{gap:8px}
+html.fit-mobile .kpi{padding:9px 12px;gap:2px}
+html.fit-mobile .kpi .mean,html.fit-mobile .kpi .bench{line-height:1.35}
+/* v4.1 desktop headroom: the inputs column sets the desktop height; spacing only */
+html.fit-desktop #inputs .field{margin-bottom:8px}
+@media print{
+  .hold-chart{break-inside:avoid;margin-top:8px;padding-top:8px}
+  .hold-chart-placeholder,.example-bar,.hc-toggle,.hc-whatif,.hc-tip{display:none !important}
+  .hc-anim .hc-grow{animation:none !important}
+}
 </style>
 </head>
 <body>
@@ -232,6 +302,18 @@ footer a:hover{color:#6E2F12}
       <h2 id="inputs-h">The property</h2>
       <p class="sec-help">Shaded cells are yours to edit. Enter your own loan terms. Results are estimates for education, not a loan offer or quote.</p>
       <div class="regz">Enter your own rate, down payment and term. Figures here are estimates, not advertised rates or payments. Confirm actual terms with a lender.</div>
+
+      <div class="example-bar" id="example-bar">
+        <label class="example-label" for="example-select">Try an example
+          <select id="example-select">
+            <option value="">Choose a rental…</option>
+            <option value="a">Rental A, Rochester single-family</option>
+            <option value="b">Rental B, Rochester single-family</option>
+            <option value="c">Rental C, Rochester single-family</option>
+          </select>
+        </label>
+        <p class="example-note">Todd's own rentals, past results, not a promise.</p>
+      </div>
 
       <label class="field">Purchase price
         <input type="number" name="price" min="0" step="1000">
@@ -317,6 +399,30 @@ footer a:hover{color:#6E2F12}
         <div class="kpis" id="kpis"></div>
         <p class="teach-note">The $100 monthly cash-flow cushion, the 0.75% amber floor on the 1% rule, and the 65% expense-ratio amber cap are teaching aids, not published industry standards. Green, amber and red bands are general rules of thumb and are not advice.</p>
         <p class="rate-note">A deal can look strong on one measure and weak on another. Use the set together, then confirm the numbers with a lender and, for taxes, an advisor.</p>
+        <section class="hold-chart" id="hold-chart" aria-labelledby="hold-chart-h">
+          <div class="hc-head">
+            <h3 id="hold-chart-h">Wealth by year</h3>
+            <div class="hc-toggle" id="hc-toggle" role="group" aria-label="Years to show" hidden>
+              <button type="button" data-years="5" aria-pressed="false" aria-label="Show 5 years">5 yr</button>
+              <button type="button" data-years="10" aria-pressed="true" aria-label="Show 10 years">10 yr</button>
+              <button type="button" data-years="30" aria-pressed="false" aria-label="Show 30 years">30 yr</button>
+            </div>
+          </div>
+          <fieldset class="hc-whatif" id="hc-whatif" hidden>
+            <legend class="sr-only">What-if sliders. They change this chart only, not your results above.</legend>
+            <label class="hc-slider" for="hc-rent"><span class="hc-sl-label"><span>Rent growth</span><output id="hc-rent-out" for="hc-rent">3.0%/yr</output></span>
+              <input type="range" id="hc-rent" min="0" max="5" step="0.5" value="3">
+            </label>
+            <label class="hc-slider" for="hc-appr"><span class="hc-sl-label"><span>Appreciation</span><output id="hc-appr-out" for="hc-appr">3.0%/yr</output></span>
+              <input type="range" id="hc-appr" min="0" max="5" step="0.5" value="3">
+            </label>
+          </fieldset>
+          <div class="hc-plot" id="hc-plot">
+            <div id="hold-chart-body"></div>
+            <div class="hc-tip" id="hc-tip" aria-hidden="true" hidden></div>
+          </div>
+          <p class="hold-chart-caption">Estimate based on your inputs. Not a prediction or a loan quote. <span id="hc-whatif-note">What-if sliders change this chart only.</span></p>
+        </section>
       </section>
     </div>
   </div>
@@ -1299,10 +1405,470 @@ footer a:hover{color:#6E2F12}
     $("#snap").innerHTML = items.map(([k,v]) => `<div><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
   }
 
+
+  const EXAMPLES = {
+    a: {price:185000, unitCount:1, rents:[2200], propTax:2400, insurance:1417, vacancy:0, maintCapexPct:0, mgmtPct:0, otherMonthly:0, otherInc:0, closingCosts:0, rehab:40000},
+    b: {price:197000, unitCount:1, rents:[2050], propTax:2400, insurance:950, vacancy:0, maintCapexPct:0, mgmtPct:0, otherMonthly:0, otherInc:0, closingCosts:0, rehab:40000},
+    c: {price:235000, unitCount:1, rents:[2224], propTax:2400, insurance:1417, vacancy:0, maintCapexPct:0, mgmtPct:0, otherMonthly:0, otherInc:0, closingCosts:0, rehab:20000}
+  };
+
+  function setExampleSelect(val) {
+    const el = $("#example-select");
+    if (el) el.value = val || "";
+  }
+
+  function loadExample(key) {
+    const ex = EXAMPLES[key];
+    if (!ex) return;
+    state.price = ex.price;
+    state.unitCount = ex.unitCount;
+    state.rents = ex.rents.slice();
+    state.propTax = ex.propTax;
+    state.insurance = ex.insurance;
+    state.vacancy = ex.vacancy;
+    state.maintCapexPct = ex.maintCapexPct;
+    state.mgmtPct = ex.mgmtPct;
+    state.otherMonthly = ex.otherMonthly;
+    state.otherInc = ex.otherInc;
+    state.closingCosts = ex.closingCosts;
+    state.rehab = ex.rehab;
+    state.down = "";
+    state.rate = "";
+    state.term = "";
+    state.balloon = 0;
+    state.loanType = C.defaultState().loanType;
+    fillSegs();
+    fillInputs();
+    recalc();
+    persist();
+    const el = $("#save-msg");
+    if (el) el.textContent = "Example loaded. Enter your own loan terms to see financed results. Saved on this device only. Nothing is sent anywhere.";
+  }
+
+  /* ---- Stacked yearly wealth chart (preview v4) ----
+     What-if state below is for the chart only. Nothing here writes back to `state`,
+     the results cards, the print recap or localStorage.
+     - Appreciation slider: initialized from the page's existing "Example appreciation % / year"
+       input (state.appreciation). CHART.appr === null means "follow the page input"; whenever
+       that page input changes, the override is dropped and the slider re-syncs to it, so there
+       is never a second, conflicting appreciation value.
+     - Rent-growth slider: the page has no rent-growth input. It starts from the engine's existing
+       rentGrowth (out.input.rentGrowth, the workbook default of 3%/yr) that already drives the
+       results' multi-year figures.
+     - Expenses: the engine already grows fixed costs (tax, insurance, other monthly) at its
+       expGrowth default (3%/yr), and percent-of-rent costs (maintenance, management) move with
+       rent. The chart keeps that existing engine behavior unchanged; the sliders do not change
+       expense growth.
+     Projection math (all from RA.compute, re-run with the two what-if rates):
+     - Loan paydown = original loan minus the scheduled balance at the end of each year (standard
+       amortization of the visitor's own terms). Years past the term have no payment (the engine's
+       schedule pays nothing after the last month), so cash flow rises and the balance stays 0.
+     - Balloon: if the visitor entered one, the chart stops at the balloon year, because the
+       remaining balance is due then and refinance terms are unknown.
+     - Appreciation equity = projected value minus the starting value at the slider rate.
+     - Cash flow so far = the engine's yearly cash flow (rent grown by the slider), summed. */
+  const CHART = {years: 10, rent: null, appr: null, pageAppr: undefined, lastOut: null,
+    animate: true, wasPending: true, active: -1, pinned: false, width: 0, rows: [], geo: null};
+  const CHART_COLORS = {
+    cf: {stroke:"#215E2C", soft:"#D3E6D6", label:"Cash flow so far"},
+    paydown: {stroke:"#A0522D", soft:"#F4DCCD", label:"Loan paid down"},
+    appr: {stroke:"#2B2420", soft:"#E2DCD6", label:"Appreciation"},
+    neg: {stroke:"#7A3E12", soft:"#F6D5C8", label:"Below zero: more out than in"}
+  };
+  const CHART_ORDER = ["cf", "paydown", "appr"];
+
+  function chartEscape(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c];
+    });
+  }
+
+  function niceTicks(min, max, count) {
+    if (!(max > min)) { max = min + 1; }
+    const span = max - min;
+    const raw = span / Math.max(1, count - 1);
+    const pow = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10));
+    const err = raw / pow;
+    const step = err >= 7.5 ? 10 * pow : err >= 3.5 ? 5 * pow : err >= 1.5 ? 2 * pow : pow;
+    const t0 = Math.floor(min / step) * step;
+    const t1 = Math.ceil(max / step) * step;
+    const ticks = [];
+    for (let v = t0; v <= t1 + step / 2; v += step) ticks.push(v);
+    return {min: t0, max: t1, ticks: ticks};
+  }
+
+  function fmtAxisUsd(v) {
+    const sign = v < 0 ? "−" : "";
+    const a = Math.abs(v);
+    if (a >= 1000000) return sign + "$" + (a / 1000000).toFixed(a % 1000000 === 0 ? 0 : 1) + "M";
+    if (a >= 1000) return sign + "$" + Math.round(a / 1000) + "k";
+    return sign + "$" + Math.round(a);
+  }
+
+  function usd(v) {
+    const r = Math.round(v);
+    return (r < 0 ? "−" : "") + C.fmtUsd(Math.abs(r), 0);
+  }
+  function usdAbout(v) {
+    const r = Math.round(v / 100) * 100;
+    return (r < 0 ? "−" : "") + C.fmtUsd(Math.abs(r), 0);
+  }
+  function pctTxt(v) { return (Math.round(v * 1000) / 10).toFixed(1) + "%"; }
+
+  function chartPending(out) { return !out || (!!out.pendingLoan && state.loanType !== "cash"); }
+  function chartRentRate(out) {
+    if (CHART.rent != null) return CHART.rent;
+    const base = out && out.input && C.isFilledNumber(out.input.rentGrowth) ? Number(out.input.rentGrowth) : Number(RA.DEFAULT_INPUTS.rentGrowth) || 0;
+    return base;
+  }
+  function chartApprRate() {
+    if (CHART.appr != null) return CHART.appr;
+    return Number(state.appreciation) || 0;
+  }
+
+  function syncChartSlider(id, rate, overridden) {
+    const el = $("#" + id), outEl = $("#" + id + "-out");
+    if (!el) return;
+    const pct = rate * 100;
+    const snapped = Math.max(0, Math.min(5, Math.round(pct * 2) / 2));
+    if (document.activeElement !== el) el.value = String(snapped);
+    const outside = !overridden && Math.abs(snapped - pct) > 1e-9;
+    const txt = pctTxt(rate) + "/yr";
+    if (outEl) outEl.textContent = txt + (outside ? " (your input)" : "");
+    el.setAttribute("aria-valuetext", pctTxt(rate) + " per year");
+  }
+
+  function chartYearSentence(r) {
+    const cfBit = r.cf < 0 ? "Cash flow so far " + usd(r.cf) + " (more out than in)" : "Cash flow so far " + usd(r.cf);
+    const pdBit = r.tenantsPaid ? "tenants paid down " + usd(r.paydown) : "loan paid down " + usd(r.paydown);
+    const apBit = "appreciation " + usd(r.appr);
+    return "Year " + r.year + ": about " + usdAbout(r.total) + " total. " + cfBit + ", " + pdBit + ", " + apBit + ".";
+  }
+
+  function chartRows(out) {
+    const rg = chartRentRate(out), ap = chartApprRate();
+    const input = Object.assign({}, out.input, {rentGrowth: rg, appreciation: ap});
+    const res = RA.compute(input, {programs: RA.PROGRAMS, useOverrides: true});
+    const proj = res.projection || [];
+    const isCash = state.loanType === "cash";
+    const loan0 = isCash ? 0 : (Number(res.loan) || 0);
+    const basis = Number(res.valueBasis) || Number(state.price) || 0;
+    const balloonYrs = (!isCash && loan0 > 0) ? (Number(state.balloon) || 0) : 0;
+    let n = CHART.years, balloonCap = 0;
+    if (balloonYrs > 0 && balloonYrs < n) { n = balloonYrs; balloonCap = balloonYrs; }
+    const rows = [];
+    let allCovered = true;
+    for (let i = 0; i < n; i++) {
+      const p = proj[i];
+      if (!p) break;
+      const yearCf = Number(p.cf || 0);
+      if (yearCf < 0) allCovered = false;
+      const paydown = loan0 > 0 ? Math.max(0, loan0 - Number(p.balance || 0)) : 0;
+      const appr = Number(p.value || 0) - basis;
+      const cf = Number(p.cum_cf || 0);
+      rows.push({year: i + 1, cf: cf, paydown: paydown, appr: appr, total: cf + paydown + appr, yearCf: yearCf, tenantsPaid: allCovered && paydown > 0});
+    }
+    return {rows: rows, rg: rg, ap: ap, balloonCap: balloonCap, loan0: loan0};
+  }
+
+  function chartNotes(d) {
+    const rows = d.rows, notes = [];
+    if (!rows.length) return notes;
+    const first = rows[0], last = rows[rows.length - 1];
+    if (d.balloonCap) notes.push({cls:"n-neg", text:"Balloon due in year " + d.balloonCap + "; the chart stops there."});
+    if (rows.some(function (r) { return r.cf < 0 || r.appr < 0; })) {
+      notes.push({cls:"n-neg", text:"Bars below the line: more went out than came in so far."});
+    }
+    if (last.tenantsPaid) {
+      notes.push({cls:"n-paydown", text:"Your tenants paid this down: about " + usdAbout(last.paydown) + " by year " + last.year + "."});
+    }
+    if (first.cf >= 0 && first.paydown > 0 && first.appr > 0 && first.cf < first.paydown && first.cf < first.appr) {
+      notes.push({cls:"n-cf", text:"Cash flow is usually the smallest slice early on, as it is here in year 1."});
+    }
+    if (notes.length < 2 && last.appr > 0 && last.appr > last.cf && last.appr > last.paydown) {
+      notes.push({cls:"n-appr", text:"Appreciation is the biggest slice by year " + last.year + " at the what-if rate. Values can also fall."});
+    }
+    return notes.slice(0, 2);
+  }
+
+  function chartPatternDefs() {
+    return "<defs>" +
+      "<pattern id=\"hcp-cf\" width=\"6\" height=\"6\" patternUnits=\"userSpaceOnUse\"><rect width=\"6\" height=\"6\" fill=\"" + CHART_COLORS.cf.soft + "\"/></pattern>" +
+      "<pattern id=\"hcp-paydown\" width=\"6\" height=\"6\" patternUnits=\"userSpaceOnUse\" patternTransform=\"rotate(45)\"><rect width=\"6\" height=\"6\" fill=\"" + CHART_COLORS.paydown.soft + "\"/><line x1=\"0\" y1=\"0\" x2=\"0\" y2=\"6\" stroke=\"" + CHART_COLORS.paydown.stroke + "\" stroke-width=\"1.4\"/></pattern>" +
+      "<pattern id=\"hcp-appr\" width=\"6\" height=\"6\" patternUnits=\"userSpaceOnUse\"><rect width=\"6\" height=\"6\" fill=\"" + CHART_COLORS.appr.soft + "\"/><circle cx=\"3\" cy=\"3\" r=\"1.1\" fill=\"" + CHART_COLORS.appr.stroke + "\"/></pattern>" +
+      "<pattern id=\"hcp-neg\" width=\"6\" height=\"6\" patternUnits=\"userSpaceOnUse\"><rect width=\"6\" height=\"6\" fill=\"" + CHART_COLORS.neg.soft + "\"/><line x1=\"0\" y1=\"3\" x2=\"6\" y2=\"3\" stroke=\"" + CHART_COLORS.neg.stroke + "\" stroke-width=\"1.2\"/></pattern>" +
+      "</defs>";
+  }
+
+  function chartSwatch(key) {
+    const c = CHART_COLORS[key];
+    return "<svg class=\"hold-chart-swatch\" viewBox=\"0 0 16 12\" aria-hidden=\"true\" focusable=\"false\"><rect x=\"0.75\" y=\"0.75\" width=\"14.5\" height=\"10.5\" fill=\"url(#hcp-" + key + ")\" stroke=\"" + c.stroke + "\" stroke-width=\"1.5\"" + (key === "neg" ? " stroke-dasharray=\"3 2\"" : "") + "/></svg>";
+  }
+
+  function drawHoldChart(out) {
+    const body = $("#hold-chart-body");
+    if (!body) return;
+    const d = chartRows(out);
+    const rows = d.rows;
+    CHART.rows = rows;
+    if (!rows.length) {
+      body.innerHTML = "<div class=\"hold-chart-placeholder\">Enter loan terms to see your projection</div>";
+      hideChartTip();
+      return;
+    }
+    const n = rows.length;
+    const W = Math.max(240, Math.round(body.clientWidth || CHART.width || 440));
+    CHART.width = W;
+    const narrow = W < 400;
+    const H = narrow ? 124 : 176;
+    const pl = 38, pr = 4, pt = 6, pb = 16;
+    const iw = W - pl - pr, ih = H - pt - pb;
+
+    let vmax = 0, vmin = 0;
+    rows.forEach(function (r) {
+      let up = 0, dn = 0;
+      CHART_ORDER.forEach(function (k) { if (r[k] > 0) up += r[k]; else dn += r[k]; });
+      if (up > vmax) vmax = up;
+      if (dn < vmin) vmin = dn;
+    });
+    const scale = niceTicks(vmin, vmax, narrow ? 4 : 5);
+    const yx = function (v) { return pt + (scale.max - v) / (scale.max - scale.min) * ih; };
+    const zeroY = yx(0);
+    const band = iw / n;
+    const bw = Math.max(3, Math.min(30, band * 0.66));
+    const cx = function (i) { return pl + band * (i + 0.5); };
+    const geo = {W: W, H: H, pt: pt, ih: ih, band: band, bw: bw, cx: [], top: []};
+
+    const last = rows[n - 1];
+    const descTxt = "Stacked bars for each of " + n + " years. By year " + last.year + ": about " + usdAbout(last.total) +
+      " total, made of cash flow so far " + usd(last.cf) + ", loan paid down " + usd(last.paydown) + " and appreciation " + usd(last.appr) +
+      ". What-if rates: rent growth " + pctTxt(d.rg) + " and appreciation " + pctTxt(d.ap) + " per year. Use the arrow keys to move between years. Estimate based on your inputs. Not a prediction or a loan quote.";
+    let svg = "<svg class=\"hold-chart-svg" + (CHART.animate ? " hc-anim" : "") + "\" viewBox=\"0 0 " + W + " " + H + "\" width=\"" + W + "\" height=\"" + H + "\" role=\"group\" aria-labelledby=\"hc-svg-title\" aria-describedby=\"hc-svg-desc\">";
+    svg += "<title id=\"hc-svg-title\">Estimated wealth by year, " + n + "-year view</title>";
+    svg += "<desc id=\"hc-svg-desc\">" + chartEscape(descTxt) + "</desc>";
+    svg += chartPatternDefs();
+    scale.ticks.forEach(function (t) {
+      const y = yx(t);
+      svg += "<line x1=\"" + pl + "\" x2=\"" + (W - pr) + "\" y1=\"" + y.toFixed(1) + "\" y2=\"" + y.toFixed(1) + "\" stroke=\"#E8D5C4\" stroke-width=\"1\" aria-hidden=\"true\"/>";
+      svg += "<text x=\"" + (pl - 4) + "\" y=\"" + (y + 3).toFixed(1) + "\" text-anchor=\"end\" font-size=\"9.5\" fill=\"#5C534C\" font-family=\"Helvetica Neue,Helvetica,Arial,sans-serif\" aria-hidden=\"true\">" + chartEscape(fmtAxisUsd(t)) + "</text>";
+    });
+    const labelEvery = n <= 10 ? 1 : 5;
+    rows.forEach(function (r, i) {
+      if (labelEvery === 1 || r.year === 1 || r.year % labelEvery === 0) {
+        svg += "<text x=\"" + cx(i).toFixed(1) + "\" y=\"" + (H - 4) + "\" text-anchor=\"middle\" font-size=\"9.5\" fill=\"#5C534C\" font-family=\"Helvetica Neue,Helvetica,Arial,sans-serif\" aria-hidden=\"true\">" + (n <= 10 ? "Y" : "") + r.year + "</text>";
+      }
+    });
+    if (CHART.active >= n) CHART.active = n - 1;
+    const tabIdx = CHART.active >= 0 ? CHART.active : n - 1;
+    const stagger = n > 10 ? 18 : 45;
+    rows.forEach(function (r, i) {
+      const x0 = cx(i) - bw / 2;
+      let up = 0, dn = 0, segs = "";
+      CHART_ORDER.forEach(function (k) {
+        const v = r[k];
+        if (!v) return;
+        let y1, y2, key = k;
+        if (v > 0) { y1 = yx(up + v); y2 = yx(up); up += v; }
+        else { y1 = yx(dn); y2 = yx(dn + v); dn += v; key = "neg"; }
+        const h = Math.max(0.5, y2 - y1);
+        const c = CHART_COLORS[key];
+        segs += "<rect x=\"" + x0.toFixed(1) + "\" y=\"" + y1.toFixed(1) + "\" width=\"" + bw.toFixed(1) + "\" height=\"" + h.toFixed(1) + "\" fill=\"url(#hcp-" + key + ")\" stroke=\"" + c.stroke + "\" stroke-width=\"" + (n > 10 ? 0.8 : 1.2) + "\"" + (key === "neg" ? " stroke-dasharray=\"3 2\"" : "") + "/>";
+      });
+      geo.cx.push(cx(i));
+      geo.top.push(yx(up));
+      svg += "<g class=\"hc-bar" + (i === CHART.active && !$("#hc-tip").hidden ? " is-active" : "") + "\" data-i=\"" + i + "\" tabindex=\"" + (i === tabIdx ? 0 : -1) + "\" role=\"img\" aria-label=\"" + chartEscape(chartYearSentence(r)) + "\">" +
+        "<rect class=\"hc-hit\" x=\"" + (pl + band * i).toFixed(1) + "\" y=\"" + pt + "\" width=\"" + band.toFixed(1) + "\" height=\"" + ih.toFixed(1) + "\" rx=\"3\"/>" +
+        "<g class=\"hc-grow\" style=\"transform-origin:0px " + zeroY.toFixed(1) + "px;animation-delay:" + (i * stagger) + "ms\">" + segs + "</g></g>";
+    });
+    svg += "<line x1=\"" + pl + "\" x2=\"" + (W - pr) + "\" y1=\"" + zeroY.toFixed(1) + "\" y2=\"" + zeroY.toFixed(1) + "\" stroke=\"#2B2420\" stroke-width=\"1.25\" aria-hidden=\"true\"/>";
+    svg += "</svg>";
+    CHART.geo = geo;
+
+    const negPresent = rows.some(function (r) { return r.cf < 0 || r.appr < 0; });
+    let legend = "<ul class=\"hold-chart-legend\" aria-label=\"Chart key\">";
+    CHART_ORDER.forEach(function (k) { legend += "<li>" + chartSwatch(k) + "<span>" + CHART_COLORS[k].label + "</span></li>"; });
+    if (negPresent) legend += "<li>" + chartSwatch("neg") + "<span>" + CHART_COLORS.neg.label + "</span></li>";
+    legend += "</ul>";
+
+    const notes = chartNotes(d);
+    let notesHtml = "";
+    if (notes.length) {
+      notesHtml = "<ul class=\"hc-notes\" aria-label=\"What the chart shows\">" + notes.map(function (nt) {
+        return "<li class=\"" + nt.cls + "\">" + chartEscape(nt.text) + "</li>";
+      }).join("") + "</ul>";
+    }
+
+    let table = "<table class=\"sr-only\"><caption>Estimated wealth by year (" + n + " years). Rent growth " + pctTxt(d.rg) + ", appreciation " + pctTxt(d.ap) + " per year. Estimate, not a prediction or a loan quote.</caption>" +
+      "<thead><tr><th scope=\"col\">Year</th><th scope=\"col\">Cash flow so far</th><th scope=\"col\">Loan paid down</th><th scope=\"col\">Appreciation</th><th scope=\"col\">Total, about</th></tr></thead><tbody>";
+    rows.forEach(function (r) {
+      table += "<tr><th scope=\"row\">Year " + r.year + "</th><td>" + usd(r.cf) + "</td><td>" + usd(r.paydown) + "</td><td>" + usd(r.appr) + "</td><td>" + usdAbout(r.total) + "</td></tr>";
+    });
+    table += "</tbody></table>";
+
+    body.innerHTML = svg + legend + notesHtml + table;
+    CHART.animate = false;
+    const tip = $("#hc-tip");
+    if (tip && !tip.hidden && CHART.active >= 0) showChartTip(CHART.active, false);
+  }
+
+  function showChartTip(i, focus) {
+    const tip = $("#hc-tip"), body = $("#hold-chart-body"), geo = CHART.geo;
+    const r = CHART.rows[i];
+    if (!tip || !body || !geo || !r) return;
+    CHART.active = i;
+    $$(".hc-bar", body).forEach(function (g) {
+      const gi = Number(g.getAttribute("data-i"));
+      g.classList.toggle("is-active", gi === i);
+      g.setAttribute("tabindex", gi === i ? "0" : "-1");
+    });
+    const pdTxt = r.tenantsPaid ? "Tenants paid down" : "Loan paid down";
+    // Tooltip wording matches the bar labels: "Cash flow so far" is cumulative.
+    tip.innerHTML = "<strong>Year " + r.year + ": about " + chartEscape(usdAbout(r.total)) + " total.</strong><br>" +
+      "Cash flow so far " + chartEscape(usd(r.cf)) + (r.cf < 0 ? " (more out than in)" : "") + ", " + pdTxt.toLowerCase() + " " + chartEscape(usd(r.paydown)) + ", appreciation " + chartEscape(usd(r.appr)) + ".";
+    tip.hidden = false;
+    const svgEl = body.querySelector("svg");
+    const scaleX = svgEl ? (svgEl.clientWidth || geo.W) / geo.W : 1;
+    const plotW = svgEl ? svgEl.clientWidth || geo.W : geo.W;
+    const tw = tip.offsetWidth, th = tip.offsetHeight;
+    const cxp = geo.cx[i] * scaleX, half = geo.bw * scaleX / 2;
+    let left = cxp > plotW / 2 ? cxp - half - 6 - tw : cxp + half + 6;
+    left = Math.max(0, Math.min(plotW - tw, left));
+    let top = geo.pt * scaleX;
+    const svgH = svgEl ? svgEl.clientHeight : geo.H;
+    if (top + th > svgH) top = Math.max(0, svgH - th);
+    tip.style.left = left.toFixed(0) + "px";
+    tip.style.top = top.toFixed(0) + "px";
+    if (focus) {
+      const g = body.querySelector(".hc-bar[data-i=\"" + i + "\"]");
+      if (g && document.activeElement !== g) g.focus();
+    }
+  }
+
+  function hideChartTip() {
+    const tip = $("#hc-tip");
+    CHART.pinned = false;
+    if (tip) tip.hidden = true;
+    $$(".hc-bar.is-active").forEach(function (g) { g.classList.remove("is-active"); });
+  }
+
+  function renderHoldChart(out) {
+    CHART.lastOut = out;
+    const body = $("#hold-chart-body");
+    if (!body) return;
+    const pageAppr = Number(state.appreciation) || 0;
+    if (CHART.pageAppr !== pageAppr) { CHART.pageAppr = pageAppr; CHART.appr = null; }
+    syncChartSlider("hc-rent", chartRentRate(out), CHART.rent != null);
+    syncChartSlider("hc-appr", chartApprRate(), CHART.appr != null);
+    const pending = chartPending(out);
+    const tg = $("#hc-toggle"), wi = $("#hc-whatif");
+    if (tg) tg.hidden = pending;
+    if (wi) wi.hidden = pending;
+    const wn = $("#hc-whatif-note");
+    if (wn) wn.hidden = pending;
+    if (pending) {
+      body.innerHTML = "<div class=\"hold-chart-placeholder\">Enter loan terms to see your projection</div>";
+      CHART.rows = [];
+      CHART.geo = null;
+      CHART.wasPending = true;
+      hideChartTip();
+      return;
+    }
+    if (CHART.wasPending) { CHART.animate = true; CHART.wasPending = false; }
+    drawHoldChart(out);
+  }
+
+  // Clear my data: back to the 10-year view, and the what-if sliders follow the page again.
+  function resetHoldChartView() {
+    CHART.years = 10;
+    CHART.rent = null;
+    CHART.appr = null;
+    CHART.active = -1;
+    CHART.animate = true;
+    hideChartTip();
+    $$("#hc-toggle button[data-years]").forEach(function (x) { x.setAttribute("aria-pressed", x.getAttribute("data-years") === "10" ? "true" : "false"); });
+  }
+
+  function initHoldChart() {
+    const body = $("#hold-chart-body");
+    const tg = $("#hc-toggle");
+    if (tg) {
+      tg.addEventListener("click", function (ev) {
+        const b = ev.target.closest("button[data-years]");
+        if (!b) return;
+        CHART.years = Number(b.getAttribute("data-years")) || 10;
+        $$("button[data-years]", tg).forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+        CHART.animate = true;
+        hideChartTip();
+        CHART.active = -1;
+        if (CHART.lastOut && !chartPending(CHART.lastOut)) drawHoldChart(CHART.lastOut);
+      });
+    }
+    [["hc-rent", "rent"], ["hc-appr", "appr"]].forEach(function (pair) {
+      const el = $("#" + pair[0]);
+      if (!el) return;
+      el.addEventListener("input", function (ev) {
+        ev.stopPropagation();
+        CHART[pair[1]] = (Number(el.value) || 0) / 100;
+        syncChartSlider(pair[0], CHART[pair[1]], true);
+        if (CHART.lastOut && !chartPending(CHART.lastOut)) drawHoldChart(CHART.lastOut);
+      });
+    });
+    if (!body) return;
+    const barOf = function (t) { const g = t && t.closest ? t.closest(".hc-bar") : null; return g && body.contains(g) ? g : null; };
+    body.addEventListener("pointerover", function (ev) {
+      const g = barOf(ev.target);
+      if (g && !CHART.pinned) showChartTip(Number(g.getAttribute("data-i")), false);
+    });
+    body.addEventListener("pointerleave", function (ev) {
+      if (ev.pointerType === "mouse" && !CHART.pinned && !body.contains(document.activeElement)) hideChartTip();
+    });
+    body.addEventListener("click", function (ev) {
+      const g = barOf(ev.target);
+      if (!g) return;
+      const i = Number(g.getAttribute("data-i"));
+      if (CHART.pinned && CHART.active === i) { hideChartTip(); return; }
+      showChartTip(i, false);
+      CHART.pinned = true;
+    });
+    body.addEventListener("focusin", function (ev) {
+      const g = barOf(ev.target);
+      if (g) showChartTip(Number(g.getAttribute("data-i")), false);
+    });
+    body.addEventListener("focusout", function (ev) {
+      if (!ev.relatedTarget || !body.contains(ev.relatedTarget)) { if (!CHART.pinned) hideChartTip(); }
+    });
+    body.addEventListener("keydown", function (ev) {
+      const g = barOf(ev.target);
+      if (!g) return;
+      const n = CHART.rows.length;
+      let i = Number(g.getAttribute("data-i"));
+      if (ev.key === "ArrowRight" || ev.key === "ArrowUp") i = Math.min(n - 1, i + 1);
+      else if (ev.key === "ArrowLeft" || ev.key === "ArrowDown") i = Math.max(0, i - 1);
+      else if (ev.key === "Home") i = 0;
+      else if (ev.key === "End") i = n - 1;
+      else if (ev.key === "Escape") { hideChartTip(); return; }
+      else return;
+      ev.preventDefault();
+      showChartTip(i, true);
+    });
+    document.addEventListener("click", function (ev) {
+      if (!body.contains(ev.target)) { const tip = $("#hc-tip"); if (tip && !tip.hidden) hideChartTip(); }
+    });
+    let rt = 0;
+    window.addEventListener("resize", function () {
+      clearTimeout(rt);
+      rt = setTimeout(function () {
+        const w = Math.round(body.clientWidth || 0);
+        if (w && w !== CHART.width && CHART.lastOut && !chartPending(CHART.lastOut)) drawHoldChart(CHART.lastOut);
+      }, 120);
+    });
+  }
+
   function recalc() {
     const out = C.computeSnapshot(state);
     renderKpis(out.kpis);
     renderSnap(out.result, out.pendingLoan);
+    renderHoldChart(out);
     const n = state.unitCount;
     $("#rent-total").textContent = n + (n === 1 ? " unit" : " units") + " · Total monthly rent " + C.fmtUsd(out.rentTotal, 0);
     $("#fha-note").hidden = state.loanType !== "fha";
@@ -1442,6 +2008,8 @@ footer a:hover{color:#6E2F12}
       localStorage.removeItem(STORE_LEGACY);
     } catch (e) {}
     state = C.defaultState();
+    resetHoldChartView();
+    setExampleSelect("");
     fillInputs();
     fillSegs();
     recalc();
@@ -1458,6 +2026,7 @@ footer a:hover{color:#6E2F12}
   };
 
   document.addEventListener("DOMContentLoaded", () => {
+    initHoldChart();
     const saved = restore();
     fillSegs();
     fillInputs();
@@ -1467,12 +2036,22 @@ footer a:hover{color:#6E2F12}
       if (el) el.textContent = "Restored numbers saved on this device.";
     }
     document.addEventListener("input", ev => {
+      if (ev.target && ev.target.id === "example-select") return;
       if (ev.target.closest("#inputs") || ev.target.closest(".more-body") || ev.target.hasAttribute("data-rent")) {
+        if ($("#example-select") && $("#example-select").value) setExampleSelect("");
         gather();
         recalc();
         persist();
       }
     });
+    const exSel = $("#example-select");
+    if (exSel) {
+      exSel.addEventListener("change", () => {
+        const key = exSel.value;
+        if (!key) return;
+        loadExample(key);
+      });
+    }
     $("#btn-add-unit").addEventListener("click", () => setUnitCount(state.unitCount + 1));
     $("#btn-remove-unit").addEventListener("click", () => { if (state.unitCount > 4) setUnitCount(state.unitCount - 1); });
     $("#btn-print").addEventListener("click", () => window.print());
