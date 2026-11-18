@@ -1042,14 +1042,16 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
       rate: s.loanType === "cash" ? 0 : Number(s.rate),
       amort: Number(s.term) || 30,
       io: 0, armfix: 0, armrate: 0,
-      balloon: (s.loanType === "cash" ? 0 : (Number(s.balloon) || 0))
+      balloon: (s.loanType === "cash" ? 0 : (Number(s.balloon) || 0)),
+      points: 0,
+      fees: 0
     };
     if (s.loanType === "conventional" && Number(s.down) < 0.20) {
       overrides.mi = 0.0075;
       overrides.miltv = 0.78;
     }
     if (s.loanType === "cash") {
-      overrides.points = 0; overrides.fees = 0; overrides.mi = 0; overrides.ufmi = 0; overrides.owner = 0;
+      overrides.mi = 0; overrides.ufmi = 0; overrides.owner = 0;
     }
     const mc = Number(s.maintCapexPct) || 0;
     return Object.assign(RA.cloneDefaults(), {
