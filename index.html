@@ -1439,7 +1439,7 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
   const EXAMPLES = {
     a: {down:0.20, rate:0.0725, term:25, balloon:5, price:185000, unitCount:1, rents:[2200], propTax:3354, insurance:915, vacancy:0, maintCapexPct:0, mgmtPct:0, otherMonthly:0, otherInc:0, closingCosts:0, rehab:40000},
     b: {down:0.20, rate:0.065, term:25, balloon:5, price:197000, unitCount:1, rents:[2050], propTax:2892, insurance:915, vacancy:0, maintCapexPct:0, mgmtPct:0, otherMonthly:0, otherInc:0, closingCosts:0, rehab:40000},
-    c: {down:0.20, rate:0.075, term:25, balloon:5, price:235000, unitCount:1, rents:[2224], propTax:3218, insurance:915, vacancy:0, maintCapexPct:0, mgmtPct:0, otherMonthly:0, otherInc:0, closingCosts:0, rehab:20000}
+    c: {down:0.20, rate:0.075, term:25, balloon:5, price:235000, unitCount:1, rents:[2224], propTax:3493, taxNote:" (est., county rates)", insurance:915, vacancy:0, maintCapexPct:0, mgmtPct:0, otherMonthly:0, otherInc:0, closingCosts:0, rehab:20000}
   };
 
   function renderExTerms(out) {
@@ -1455,7 +1455,7 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
     }
     const usd2 = v => "$" + Number(v).toLocaleString("en-US", {minimumFractionDigits:2, maximumFractionDigits:2});
     const piti = r.pi + (r.mim || 0) + r.taxm + r.insm;
-    const taxNote = same(state.propTax, ex.propTax) ? " (2026 Olmsted County)" : "";
+    const taxNote = same(state.propTax, ex.propTax) ? (ex.taxNote || " (2026 Olmsted County)") : "";
     const insNote = same(state.insurance, ex.insurance) ? " (estimate)" : "";
     el.textContent = "Todd's real-world past loan: " + C.fmtPct(ex.down, 0) + " down, " + (ex.balloon * 12) + " monthly payments of " + usd2(r.pi) +
       " principal and interest (" + ex.term + "-yr amortization), plus optional line items: property tax " + usd2(r.taxm) + "/mo" + taxNote +
