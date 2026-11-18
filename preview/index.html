@@ -26,7 +26,7 @@
   window.addEventListener("orientationchange", applyFitZoom);
 })();
 </script>
-<title>Rental Property Snapshot | Todd Renard, REALTOR®</title>
+<title>Rental Calculator | Todd Renard, REALTOR®</title>
 <meta name="description" content="Estimates only. A short, private rental-property snapshot from Todd Renard, REALTOR®, Harbor Realty and Management Group. Not a rate quote, loan approval, tax or financial advice.">
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect fill=%22%23A0522D%22 width=%2232%22 height=%2232%22 rx=%224%22/%3E%3C/svg%3E">
@@ -306,7 +306,7 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
     <div>
       <p class="eyebrow">Todd Renard, REALTOR®</p>
       <p class="broker">Harbor Realty and Management Group</p>
-      <h1>Rental Property Snapshot</h1>
+      <h1>Rental Calculator</h1>
     </div>
     <div class="actions">
       <button type="button" class="btn" id="btn-print">Download PDF</button>
@@ -337,7 +337,7 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
             <option value="c">Rental C, Rochester single-family</option>
           </select>
         </label>
-        <p class="example-note">Todd's own rentals and loans, past results, not a promise.</p>
+        <p class="example-note">Todd's real-world rentals and loans. Not a promise or offer of credit.</p>
       </div>
 
       <label class="field">Purchase price
@@ -497,7 +497,7 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
   <p>Estimates only, not a rate quote, loan approval, tax or financial advice. Confirm terms with a lender and tax advisor. Rates, down payments and fees you enter are used only to estimate results; they are not offered or advertised terms.</p>
   <p>For educational purposes; not a loan offer. Todd Renard is a licensed real estate agent, not a lender.</p>
   <p>This page runs entirely on your device. It does not send your numbers anywhere, and it uses no cookies or analytics. If you choose to save, a copy is stored only in this browser. Use “Clear my data” to remove it.</p>
-  <p class="print-only">Printed from the Rental Property Snapshot calculator for Todd Renard, REALTOR®, Harbor Realty and Management Group. Figures are estimates as of the date of printing. Green / amber / red marks are general rules of thumb, not advice.</p>
+  <p class="print-only">Printed from the Rental Calculator for Todd Renard, REALTOR®, Harbor Realty and Management Group. Figures are estimates as of the date of printing. Green / amber / red marks are general rules of thumb, not advice.</p>
 </footer>
 
 <script>
@@ -1434,9 +1434,9 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
 
 
   const EXAMPLES = {
-    a: {down:0.20, rate:0.0725, term:30, balloon:5, price:185000, unitCount:1, rents:[2200], propTax:2400, insurance:1417, vacancy:0, maintCapexPct:0, mgmtPct:0, otherMonthly:0, otherInc:0, closingCosts:0, rehab:40000},
-    b: {down:0.20, rate:0.065, term:30, balloon:5, price:197000, unitCount:1, rents:[2050], propTax:2400, insurance:950, vacancy:0, maintCapexPct:0, mgmtPct:0, otherMonthly:0, otherInc:0, closingCosts:0, rehab:40000},
-    c: {down:0.20, rate:0.075, term:30, balloon:5, price:235000, unitCount:1, rents:[2224], propTax:2400, insurance:1417, vacancy:0, maintCapexPct:0, mgmtPct:0, otherMonthly:0, otherInc:0, closingCosts:0, rehab:20000}
+    a: {down:0.20, rate:0.0725, term:25, balloon:5, price:185000, unitCount:1, rents:[2200], propTax:2400, insurance:1417, vacancy:0, maintCapexPct:0, mgmtPct:0, otherMonthly:0, otherInc:0, closingCosts:0, rehab:40000},
+    b: {down:0.20, rate:0.065, term:25, balloon:5, price:197000, unitCount:1, rents:[2050], propTax:2400, insurance:950, vacancy:0, maintCapexPct:0, mgmtPct:0, otherMonthly:0, otherInc:0, closingCosts:0, rehab:40000},
+    c: {down:0.20, rate:0.075, term:25, balloon:5, price:235000, unitCount:1, rents:[2224], propTax:2400, insurance:1417, vacancy:0, maintCapexPct:0, mgmtPct:0, otherMonthly:0, otherInc:0, closingCosts:0, rehab:20000}
   };
 
   function setExampleSelect(val) {
@@ -1469,7 +1469,12 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
     recalc();
     persist();
     const el = $("#save-msg");
-    if (el) el.textContent = "Example loaded with Todd's own past loan terms (30-year amortization estimated). Not a current rate or offer of credit. Saved on this device only.";
+    if (el) {
+      const r = C.computeSnapshot(state).result;
+      const usd2 = v => "$" + Number(v).toLocaleString("en-US", {minimumFractionDigits:2, maximumFractionDigits:2});
+      el.textContent = "Todd's real-world past loan: " + (ex.balloon * 12) + " monthly payments of " + usd2(r.pi) +
+        " principal and interest (" + ex.term + "-yr amortization), then a balloon of about " + usd2(r.balloond) + ". Not a current rate or offer of credit.";
+    }
   }
 
   /* ---- Stacked yearly wealth chart (preview v4) ----
