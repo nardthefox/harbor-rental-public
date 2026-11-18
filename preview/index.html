@@ -27,7 +27,7 @@
 })();
 </script>
 <title>Rental Calculator | Todd Renard, REALTOR®</title>
-<meta name="description" content="Estimates only. A short, private rental-property snapshot from Todd Renard, REALTOR®, Harbor Realty and Management Group. Not a rate quote, loan approval, tax or financial advice.">
+<meta name="description" content="Estimates only. A short, private rental calculator from Todd Renard, REALTOR®, Harbor Realty and Management Group. Not a rate quote, loan approval, tax or financial advice.">
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect fill=%22%23A0522D%22 width=%2232%22 height=%2232%22 rx=%224%22/%3E%3C/svg%3E">
 <style>
@@ -163,6 +163,7 @@ details.more summary{cursor:pointer;font-weight:700;color:var(--navy);font-famil
 .snap div{background:var(--inset);border-radius:8px;padding:10px 12px}
 .snap .k{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
 .snap .v{font-family:var(--font-display);font-size:1.15rem;color:var(--navy);font-weight:700}
+.ex-terms{margin:0 0 12px;padding:8px 12px;background:var(--inset);border-left:4px solid var(--sienna);border-radius:0 8px 8px 0;font-size:13px;line-height:1.4;color:var(--ink)}
 .saved{font-size:12px;color:var(--muted);margin:8px 0 0}
 footer,footer.site{padding:20px 0 36px;color:var(--muted);font-size:14px;border-top:1px solid var(--line);margin-top:28px;padding-top:18px}
 footer p,footer.site p{margin:0 0 6px}
@@ -263,6 +264,7 @@ html.fit-mobile .hc-notes{font-size:11px;line-height:1.3;margin-top:2px}
 html.fit-mobile .hc-notes li{display:inline;margin:0 4px 0 0;padding-left:5px}
 html.fit-mobile .hold-chart-caption{font-size:11px;line-height:1.3;margin-top:2px}
 html.fit-mobile .deal-flag{font-size:12.5px;line-height:1.35;padding:7px 10px;margin:0 0 8px}
+html.fit-mobile .ex-terms{font-size:12px;line-height:1.3;padding:6px 9px;margin:0 0 8px}
 html.fit-mobile .kpis{gap:8px}
 html.fit-mobile .kpi{padding:9px 12px;gap:2px}
 html.fit-mobile .kpi .mean,html.fit-mobile .kpi .bench{line-height:1.35}
@@ -326,7 +328,7 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
     <section class="card" id="inputs" aria-labelledby="inputs-h">
       <h2 id="inputs-h">The property</h2>
       <p class="sec-help">Shaded cells are yours to edit. Enter your own loan terms. Results are estimates for education, not a loan offer or quote.</p>
-      <div class="regz">Enter your own rate, down payment and term. Figures here are estimates, not advertised rates or payments. Confirm actual terms with a lender.</div>
+      <div class="regz">Examples load Todd's own past loan terms, shown for education only. Enter your own rate, down payment and term for your numbers. Figures are estimates, not offered or advertised terms. Confirm actual terms with a lender.</div>
 
       <div class="example-bar" id="example-bar">
         <label class="example-label" for="example-select">Try an example
@@ -421,6 +423,7 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
         <h2 id="results-h">How this deal looks</h2>
         <p class="sec-help">Each card is a snapshot, not a verdict. Green, amber and red are general rules of thumb — they vary by market, strategy and lender, and they are not advice.</p>
         <div class="deal-flag" id="balloon-flag" hidden></div>
+        <p class="ex-terms" id="ex-terms" hidden></p>
         <div class="kpis" id="kpis"></div>
         <p class="teach-note">The $100 monthly cash-flow cushion, the 0.75% amber floor on the 1% rule, and the 65% expense-ratio amber cap are teaching aids, not published industry standards. Green, amber and red bands are general rules of thumb and are not advice.</p>
         <p class="rate-note">A deal can look strong on one measure and weak on another. Use the set together, then confirm the numbers with a lender and, for taxes, an advisor.</p>
@@ -1439,6 +1442,24 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
     c: {down:0.20, rate:0.075, term:25, balloon:5, price:235000, unitCount:1, rents:[2224], propTax:2400, insurance:1417, vacancy:0, maintCapexPct:0, mgmtPct:0, otherMonthly:0, otherInc:0, closingCosts:0, rehab:20000}
   };
 
+  function renderExTerms(out) {
+    const el = $("#ex-terms");
+    if (!el) return;
+    const sel = $("#example-select");
+    const ex = sel ? EXAMPLES[sel.value] : null;
+    const same = (a, b) => Math.abs(Number(a) - Number(b)) < 1e-9;
+    const r = out && out.result;
+    if (!ex || !r || out.pendingLoan || state.loanType !== "conventional" || !same(state.price, ex.price) ||
+        !same(state.down, ex.down) || !same(state.rate, ex.rate) || !same(state.term, ex.term) || !same(state.balloon, ex.balloon)) {
+      el.hidden = true; el.textContent = ""; return;
+    }
+    const usd2 = v => "$" + Number(v).toLocaleString("en-US", {minimumFractionDigits:2, maximumFractionDigits:2});
+    el.textContent = "Todd's real-world past loan: " + C.fmtPct(ex.down, 0) + " down, " + (ex.balloon * 12) + " monthly payments of " + usd2(r.pi) +
+      " principal and interest (" + ex.term + "-yr amortization), then a balloon of about " + usd2(r.balloond) + ". Estimated APR " + C.fmtApr(C.computeApr(r)) + ". " +
+      "Payments don't include property taxes or insurance; the actual payment will be higher. Not a current rate or offer of credit.";
+    el.hidden = false;
+  }
+
   function setExampleSelect(val) {
     const el = $("#example-select");
     if (el) el.value = val || "";
@@ -1469,12 +1490,7 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
     recalc();
     persist();
     const el = $("#save-msg");
-    if (el) {
-      const r = C.computeSnapshot(state).result;
-      const usd2 = v => "$" + Number(v).toLocaleString("en-US", {minimumFractionDigits:2, maximumFractionDigits:2});
-      el.textContent = "Todd's real-world past loan: " + (ex.balloon * 12) + " monthly payments of " + usd2(r.pi) +
-        " principal and interest (" + ex.term + "-yr amortization), then a balloon of about " + usd2(r.balloond) + ". Not a current rate or offer of credit.";
-    }
+    if (el) el.textContent = "Example loaded with Todd's past loan terms. Saved on this device only. Nothing is sent anywhere.";
   }
 
   /* ---- Stacked yearly wealth chart (preview v4) ----
@@ -1901,6 +1917,7 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
     renderKpis(out.kpis);
     renderSnap(out.result, out.pendingLoan);
     renderHoldChart(out);
+    renderExTerms(out);
     const n = state.unitCount;
     $("#rent-total").textContent = n + (n === 1 ? " unit" : " units") + " · Total monthly rent " + C.fmtUsd(out.rentTotal, 0);
     $("#fha-note").hidden = state.loanType !== "fha";
@@ -1957,7 +1974,7 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
       } else {
         aprEl.hidden = false;
         aprEl.innerHTML = "<span class=\"apr-value\">Example APR " + C.fmtApr(apr) + "</span> " +
-          "This estimate includes the interest rate you entered, plus any mortgage insurance in the payment stream. Lender points and fees are not included. It does not include property tax or homeowners insurance. It is an estimate only — not a quote, not a closing disclosure, and not an advertised credit term.";
+          "This estimate includes the interest rate shown, plus any mortgage insurance in the payment stream. Lender points and fees are not included. It does not include property tax or homeowners insurance. It is an estimate only — not a quote, not a closing disclosure, and not an advertised credit term.";
       }
     }
     const loan = C.loanById(state.loanType);
