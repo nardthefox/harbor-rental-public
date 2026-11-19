@@ -117,7 +117,10 @@ input:focus,select:focus{outline:2px solid var(--navy);outline-offset:1px;border
 .seg button[aria-pressed="true"]{background:var(--sienna);color:#fff;border-color:var(--sienna)}
 .seg button:focus{outline:2px solid var(--navy);outline-offset:1px}
 .seg button:disabled,.seg button[aria-disabled="true"]{opacity:.45;cursor:not-allowed;background:var(--inset);color:var(--muted)}
-.units{display:grid;gap:8px;margin:8px 0}
+.units{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+.unit-row:only-child{grid-column:1/-1}
+/* Past 4 units the rows scroll inside a short box, so a big building doesn't stretch the page. */
+.units.many{max-height:104px;overflow-y:auto;overscroll-behavior:contain;padding-right:4px}
 .unit-row{display:grid;grid-template-columns:52px 1fr;gap:8px;align-items:center}
 .unit-row label{font-size:13px;color:var(--muted)}
 .unit-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
@@ -150,21 +153,42 @@ input:focus,select:focus{outline:2px solid var(--navy);outline-offset:1px;border
 .kpi.na .value{color:var(--muted)}
 .kpi.pending{background:var(--kpi);border-color:var(--line)}
 .kpi.pending .value{color:var(--muted)}
+html.fit-mobile .kpi.pending{min-height:175px}
 .deal-flag.pending{background:var(--inset);color:var(--ink);border-color:var(--line)}
 .deal-flag.pending strong{color:var(--ink)}
 .rate-note{font-size:13px;color:var(--muted);margin:10px 0 0}
-.explainer{margin-top:16px}
+.swap{margin-top:16px}
+.swap-tabs{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px;border-bottom:1px solid var(--line);padding-bottom:10px}
+.swap-tabs button{font:inherit;font-size:14px;font-weight:700;min-height:36px;padding:6px 12px;border:1px solid var(--line-d);border-radius:8px;background:#fff;color:var(--ink);cursor:pointer}
+.swap-tabs button[aria-selected="true"]{background:var(--rust-d);border-color:var(--rust-d);color:#fff}
+.swap-tabs button:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+/* Both panels share one grid cell, so the card is always as tall as the taller panel and switching never changes the page height. */
+.swap-panels{display:grid}
+.swap-panel{grid-area:1/1;min-width:0}
+.swap-panel.is-off{display:none}
+.start-here{background:var(--inset);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin:0 0 12px}
+.start-here h3{margin:0 0 6px}
+.start-here ol{margin:0 0 10px;padding-left:20px;font-size:14px;line-height:1.45}
+.start-here li+li{margin-top:4px}
+.start-ex{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}
+.gloss{margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+.gloss h3{margin:0 0 6px}
+.gloss dl{display:grid;grid-template-columns:1fr 1fr;gap:12px 28px;align-content:space-between;margin:0}
+.gl-item dt{font-weight:700;font-size:14px;color:var(--navy)}
+.gl-item dd{margin:2px 0 0;font-size:14px;line-height:1.45;color:var(--ink)}
+.swap-panels.is-clamped{overflow-y:auto;overscroll-behavior:auto;padding-right:4px;border-bottom:1px solid var(--line)}
 .explainer ol,.explainer ul{margin:8px 0 0;padding:0 0 0 1.15rem}
-.explainer li{margin:0 0 8px;color:var(--ink)}
+.explainer li{margin:0 0 calc(8px + var(--fill-li,0px));color:var(--ink)}
 .explainer li strong{color:var(--navy)}
-details.more{margin-top:16px;border:1px solid var(--line);border-radius:10px;padding:8px 14px;background:var(--card);box-shadow:var(--shadow);border-top:4px solid var(--slate)}
-details.more summary{cursor:pointer;font-weight:700;color:var(--navy);font-family:var(--font-display);font-size:18px;padding:8px 0}
-.snap{display:grid;gap:8px;grid-template-columns:1fr 1fr;margin-top:8px}
+.snap{display:grid;gap:calc(8px + var(--fill-more,0px)) 8px;grid-template-columns:1fr 1fr;margin-top:8px}
+.more-body>.row{padding-bottom:var(--fill-more,0px)}
+.more-body>h3{padding-top:var(--fill-more,0px)}
+.more-body>.snap{padding-top:var(--fill-more,0px)}
 .snap div{background:var(--inset);border-radius:8px;padding:10px 12px}
 .snap .k{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
 .snap .v{font-family:var(--font-display);font-size:1.15rem;color:var(--navy);font-weight:700}
 .ex-terms{margin:0 0 12px;padding:8px 12px;background:var(--inset);border-left:4px solid var(--sienna);border-radius:0 8px 8px 0;font-size:13px;line-height:1.4;color:var(--ink)}
-.saved{font-size:12px;color:var(--muted);margin:8px 0 0}
+.saved{font-size:12px;color:var(--muted);margin:8px 0 0;min-height:2.9em}
 footer,footer.site{padding:20px 0 36px;color:var(--muted);font-size:14px;border-top:1px solid var(--line);margin-top:28px;padding-top:18px}
 footer p,footer.site p{margin:0 0 6px}
 footer.site .name,footer .name{font-family:var(--font-display);font-size:20px;color:var(--ink);font-weight:700;margin-bottom:6px}
@@ -177,7 +201,7 @@ footer a:hover{color:#6E2F12}
   :root{print-color-adjust:exact;-webkit-print-color-adjust:exact}
   @page{size:letter;margin:.5in}
   body{background:#fff;font-size:11px;line-height:1.3}
-  .skip,.actions,.btn,.btn-ghost,.unit-actions,.saved,.lede,#inputs,#explainer{display:none !important}
+  .skip,.actions,.btn,.btn-ghost,.unit-actions,.saved,.lede,#inputs,#explainer,.swap-tabs,#start-here,#gloss{display:none !important}
   .top{padding:8px 0 0;border-bottom:0;box-shadow:none}
   .top h1{font-size:22px}
   .disclaimer{font-size:10.5px;padding:6px 0}
@@ -185,11 +209,12 @@ footer a:hover{color:#6E2F12}
   .wrap{width:auto;margin:0}
   main{padding:8px 0}
   .grid-page{display:block}
-  .card,details.more{box-shadow:none;margin:0 0 10px;padding:10px 12px;break-inside:auto}
+  .card{box-shadow:none;margin:0 0 10px;padding:10px 12px;break-inside:auto}
   #results{break-inside:avoid}
-  details.more,.snap{break-inside:avoid}
-  details.more{display:block}
-  details.more summary{display:none}
+  .swap,.snap{break-inside:avoid}
+  .swap-panels{display:block;min-height:0 !important;max-height:none !important;overflow:visible !important}
+  .units.many{max-height:none;overflow:visible}
+  .swap-panel.is-off{display:block}
   .more-body{display:block !important}
   .more-body .row, .more-body .sec-help{display:none !important}
   h2{font-size:16px}
@@ -222,7 +247,7 @@ html.fit-mobile .example-bar{margin:0 0 8px}
 .hc-slider output{font-weight:700;color:var(--rust-d);white-space:nowrap}
 .hc-slider input[type=range]{width:100%;margin:0;height:22px;accent-color:var(--rust-d);background:transparent;padding:0;border:0;min-height:0}
 .hc-plot{position:relative}
-.hold-chart-placeholder{background:var(--inset);border:1px dashed var(--line-d);border-radius:8px;padding:18px 14px;color:var(--muted);font-size:14px;font-weight:650;text-align:center}
+.hold-chart-placeholder{background:var(--inset);border:1px dashed var(--line-d);border-radius:8px;padding:18px 14px;color:var(--muted);font-size:14px;font-weight:650;text-align:center;min-height:230px;display:flex;align-items:center;justify-content:center}
 .hold-chart-svg{width:100%;height:auto;display:block;overflow:visible}
 .hc-bar{cursor:pointer;outline:none}
 .hc-bar .hc-hit{fill:transparent;stroke:none}
@@ -253,7 +278,7 @@ html.fit-mobile .hc-head h3{font-size:15px;line-height:1.3}
 html.fit-mobile .hc-whatif{gap:0 10px;margin:0 0 2px}
 html.fit-mobile .hc-slider{font-size:11.5px;line-height:1.3}
 html.fit-mobile .hc-slider input[type=range]{height:18px}
-html.fit-mobile .hold-chart-placeholder{padding:10px 8px;font-size:13px}
+html.fit-mobile .hold-chart-placeholder{padding:10px 8px;font-size:13px;min-height:150px}
 html.fit-mobile .hold-chart-legend{font-size:10.5px;line-height:1.25;gap:1px 8px;margin-top:2px}
 html.fit-mobile .hold-chart-legend .hold-chart-swatch{width:13px;height:10px;flex-basis:13px}
 html.fit-mobile .hc-notes{font-size:11px;line-height:1.3;margin-top:2px}
@@ -290,9 +315,13 @@ html.fit-mobile .example-apr{line-height:1.35;padding:8px 10px}
 html.fit-mobile .teach-note{line-height:1.38;margin-top:8px}
 html.fit-mobile .rate-note{line-height:1.38;margin-top:8px}
 html.fit-mobile .kpi .mean,html.fit-mobile .kpi .bench{line-height:1.3}
-html.fit-mobile .explainer{margin-top:10px}
-html.fit-mobile .explainer li{margin:0 0 5px}
-html.fit-mobile details.more{margin-top:10px}
+html.fit-mobile .swap{margin-top:10px}
+html.fit-mobile .gloss{margin-top:10px;padding-top:10px}
+html.fit-mobile .gloss dl{grid-template-columns:1fr;gap:12px}
+html.fit-mobile .start-here{padding:10px 12px}
+html.fit-mobile .swap-tabs{margin:0 0 8px;padding-bottom:8px}
+html.fit-mobile .swap-tabs button{font-size:13px;min-height:34px;padding:5px 10px}
+html.fit-mobile .explainer li{margin:0 0 calc(5px + var(--fill-li,0px))}
 html.fit-mobile footer,html.fit-mobile footer.site{margin-top:16px;padding-top:12px;padding-bottom:12px}
 html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
 </style>
@@ -418,6 +447,20 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
       <section class="card" id="results" aria-labelledby="results-h">
         <h2 id="results-h">How this deal looks</h2>
         <p class="sec-help">Each card is a snapshot, not a verdict. Green, amber and red are general rules of thumb — they vary by market, strategy and lender, and they are not advice.</p>
+        <section class="start-here" id="start-here" aria-labelledby="start-h" hidden>
+          <h3 id="start-h">Start here</h3>
+          <ol>
+            <li>Load one of Todd’s past rentals, or type your own price and rents in the form.</li>
+            <li>Add a down payment, interest rate and amortization to see monthly cash flow, cash-on-cash return and DSCR.</li>
+            <li>Open “More detail (optional)” below for closing costs, other income and a five-year equity snapshot.</li>
+          </ol>
+          <div class="start-ex">
+            <button type="button" class="btn-ghost" data-load-ex="a">Load Rental A</button>
+            <button type="button" class="btn-ghost" data-load-ex="b">Load Rental B</button>
+            <button type="button" class="btn-ghost" data-load-ex="c">Load Rental C</button>
+          </div>
+          <p class="hint">Examples use Todd’s own past loan terms, for education only. Not a current rate or offer of credit.</p>
+        </section>
         <div class="deal-flag" id="balloon-flag" hidden></div>
         <p class="ex-terms" id="ex-terms" hidden></p>
         <div class="kpis" id="kpis"></div>
@@ -446,7 +489,13 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
     </div>
   </div>
 
-  <section class="card explainer" id="explainer" aria-labelledby="explainer-h">
+  <section class="card swap" id="swap" aria-label="KPIs explained and more detail">
+  <div class="swap-tabs" role="tablist" aria-label="Show">
+    <button type="button" role="tab" id="swap-tab-kpi" aria-controls="explainer" aria-selected="true">KPIs explained</button>
+    <button type="button" role="tab" id="swap-tab-more" aria-controls="more" aria-selected="false" tabindex="-1">More detail (optional)</button>
+  </div>
+  <div class="swap-panels">
+  <section class="explainer swap-panel" id="explainer" role="tabpanel" aria-labelledby="explainer-h">
     <h2 id="explainer-h">KPIs of a successful rental</h2>
     <p class="sec-help">These are the measures most investors check first. None of them is a guarantee. Treat them as a common language for “does this property pay its way?”</p>
     <ul>
@@ -460,8 +509,7 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
     </ul>
   </section>
 
-  <details class="more" id="more">
-    <summary>More detail (optional)</summary>
+  <div class="more swap-panel is-off" id="more" role="tabpanel" aria-labelledby="swap-tab-more">
     <div class="more-body">
       <p class="sec-help">These extras change cash invested and the five-year snapshot. Leave the examples if you’re just exploring.</p>
       <div class="row row-3">
@@ -481,7 +529,27 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
       <p class="hint">Assumes the loan is paid as scheduled and value grows at your example appreciation rate. Principal paydown is included in equity. This is not a projection you should bank on, and it is not tax advice.</p>
       <div class="snap" id="snap"></div>
     </div>
-  </details>
+  </div>
+  </div>
+  <div class="gloss" id="gloss" hidden>
+    <h3 id="gloss-h">Terms used on this page</h3>
+    <dl aria-labelledby="gloss-h">
+      <div class="gl-item" hidden><dt>Net operating income (NOI)</dt><dd>Rent plus any other income, minus vacancy and operating costs: property tax, insurance, the maintenance + CapEx reserve, management and other monthly costs. It leaves out the mortgage payment.</dd></div>
+      <div class="gl-item" hidden><dt>PITI and PITIA</dt><dd>Principal, interest, property tax and insurance, the full monthly housing payment. PITIA adds association (HOA) dues; this page also counts any monthly mortgage insurance in it. The DSCR card uses rent ÷ PITIA.</dd></div>
+      <div class="gl-item" hidden><dt>Cash invested</dt><dd>Down payment plus closing costs, points and loan fees, and any upfront rehab / CapEx. It is the bottom half of the cash-on-cash return.</dd></div>
+      <div class="gl-item" hidden><dt>Amortization</dt><dd>The number of years the monthly payment is set to pay the loan off over. A longer amortization means a lower payment and slower paydown.</dd></div>
+      <div class="gl-item" hidden><dt>Balloon payment</dt><dd>The loan balance still owed when a balloon comes due, paid in one lump sum, often by refinancing or selling. The monthly payment is still figured over the full amortization.</dd></div>
+      <div class="gl-item" hidden><dt>Example APR</dt><dd>The cost of credit as a yearly rate. It counts interest plus prepaid finance charges such as points, loan fees and upfront mortgage insurance, figured in the spirit of Regulation Z, Appendix J. Here it is an estimate for education that excludes taxes and insurance. It is not a rate quote or offer of credit.</dd></div>
+      <div class="gl-item" hidden><dt>Vacancy</dt><dd>The share of income you expect to lose to empty months and turnover between tenants.</dd></div>
+      <div class="gl-item" hidden><dt>Maintenance + CapEx reserve</dt><dd>A monthly set-aside, as a percent of rent, for repairs and for big replacements such as a roof, furnace or water heater. It is separate from one-time upfront rehab.</dd></div>
+      <div class="gl-item" hidden><dt>Principal paydown</dt><dd>The part of each loan payment that lowers the balance. It builds equity even if the property’s value does not change.</dd></div>
+      <div class="gl-item" hidden><dt>Equity</dt><dd>Estimated property value minus what is still owed on the loan. The five-year snapshot under More detail shows an estimate, not a projection to bank on.</dd></div>
+      <div class="gl-item" hidden><dt>FHA house hack</dt><dd>Buying a 2–4 unit property with an FHA loan and living in one unit. Here that unit’s rent is not counted as income. FHA loans carry mortgage insurance premiums.</dd></div>
+      <div class="gl-item" hidden><dt>DSCR loan</dt><dd>An investor loan that qualifies mainly on whether the property’s rent covers its payment, rather than on your personal income. Terms vary by lender.</dd></div>
+      <div class="gl-item" hidden><dt>What-if sliders</dt><dd>The rent growth and appreciation sliders on the Wealth by year chart change that chart only, not the cards above it.</dd></div>
+    </dl>
+  </div>
+  </section>
 </main>
 <footer class="site wrap">
   <p class="name">Todd Renard</p>
@@ -1352,6 +1420,7 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
       box.appendChild(row);
     }
     $("#btn-remove-unit").hidden = state.unitCount <= 4;
+    box.classList.toggle("many", state.unitCount > 4);
     const more = state.unitCount > 4;
     $$("#unit-seg button").forEach((b, i) => {
       b.setAttribute("aria-pressed", (!more && state.unitCount === i + 1) ? "true" : "false");
@@ -1988,9 +2057,98 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
     return out.result;
   }
 
+  /* v4.11 fixed-host fit (framed only). The Wix host for this page has a fixed height that
+     scales with its width, and it does not follow the posted height. So in a frame the
+     calculator always posts the same height for the zoom design width: FIT_POSTED below,
+     in design px (342 wide on phones, 1000 wide on desktop), times the fit zoom.
+     - Shorter states: the KPIs / More detail card grows to fill the difference.
+     - Taller states (examples, loan terms, 2+ units): that card gets a shorter box and
+       scrolls inside, down to FIT_MIN_PANEL. Nothing else on the page changes.
+     Keep the Wix host at FIT_POSTED x (host width / design width). */
+  const FIT_POSTED = {mobile: 7130, desktop: 3490};
+  const FIT_MIN_PANEL = {mobile: 420, desktop: 200};
+  let fitBusy = false;
+  // Optional content used to fill a fixed host. All hidden until fitToHost shows what fits.
+  function resetFill() {
+    const start = $("#start-here"), gloss = $("#gloss");
+    const dl = gloss.querySelector("dl");
+    const items = Array.prototype.slice.call(gloss.querySelectorAll(".gl-item"));
+    const sel = $("#example-select");
+    const cur = window.__rentalV2;
+    const startOk = !(sel && sel.value) && !!(cur && cur.pendingLoan);
+    start.hidden = true; gloss.hidden = true; dl.style.minHeight = "";
+    items.forEach(it => { it.hidden = true; });
+    return {start, gloss, dl, items, startOk};
+  }
+  // Not framed (opened directly): no fixed host, so show everything that applies.
+  function showAllFill() {
+    const f = resetFill();
+    f.start.hidden = !f.startOk;
+    f.gloss.hidden = false;
+    f.items.forEach(it => { it.hidden = false; });
+  }
+  function fitToHost() {
+    const panels = document.querySelector(".swap-panels");
+    if (!panels) return;
+    let framed;
+    try { framed = window.self !== window.top; } catch (e) { framed = true; }
+    if (!framed) return;
+    const root = document.documentElement;
+    const z = parseFloat(root.style.zoom) || 1;
+    const mode = root.classList.contains("fit-mobile") ? "mobile" : "desktop";
+    const kids = document.body.children;
+    const measure = () => {
+      let bottom = 0;
+      for (let i = 0; i < kids.length; i++) bottom = Math.max(bottom, kids[i].getBoundingClientRect().bottom);
+      return bottom + (window.scrollY || window.pageYOffset || 0) + 16;
+    };
+    panels.style.minHeight = "";
+    panels.style.maxHeight = "";
+    panels.style.removeProperty("--fill-li");
+    panels.style.removeProperty("--fill-more");
+    panels.classList.remove("is-clamped");
+    const fill = resetFill();
+    const natural = measure();
+    root.setAttribute("data-fit-natural", String(Math.round(natural / z)));
+    const target = FIT_POSTED[mode] * z - 1; // posted height is rounded up
+    const slack = target - natural;
+    if (slack >= 0) {
+      // v4.12: spend the slack on real content first (Start here, then glossary
+      // terms, each only if it fits whole), then spread what is left between
+      // glossary rows; only if no term fits does the KPI card take it.
+      const tryShow = el => { el.hidden = false; if (measure() > target) { el.hidden = true; return false; } return true; };
+      if (fill.startOk) tryShow(fill.start);
+      fill.gloss.hidden = false;
+      let shown = 0;
+      fill.items.forEach(it => { if (tryShow(it)) shown++; });
+      if (!shown) fill.gloss.hidden = true;
+      const left = Math.max(0, target - measure());
+      if (shown) {
+        fill.dl.style.minHeight = ((fill.dl.getBoundingClientRect().height + left) / z).toFixed(2) + "px";
+      } else if (left > 0) {
+        // Too little room for a glossary term: spread it between the rows of the open tab.
+        const kpiOn = !$("#explainer").classList.contains("is-off");
+        const gaps = kpiOn ? Math.max(1, $$("#explainer li").length) : 3 + Math.max(0, Math.ceil($$("#snap > div").length / 2) - 1);
+        panels.style.setProperty(kpiOn ? "--fill-li" : "--fill-more", (left / z / gaps).toFixed(2) + "px");
+        const over = measure() - target;
+        if (over > 0.5) panels.style.minHeight = "";
+        const short = target - measure();
+        if (short > 0.5) panels.style.minHeight = ((panels.getBoundingClientRect().height + short) / z).toFixed(2) + "px";
+      }
+      root.setAttribute("data-fit-fill", (fill.start.hidden ? 0 : 1) + ":" + shown + ":" + Math.round(left / z));
+    } else {
+      root.setAttribute("data-fit-fill", "clamp");
+      const ph = panels.getBoundingClientRect().height;
+      const want = Math.max(FIT_MIN_PANEL[mode] * z, ph + slack);
+      panels.style.maxHeight = (want / z).toFixed(2) + "px";
+      panels.classList.add("is-clamped");
+    }
+  }
+
   function postResize() {
     try {
-      if (window.parent === window) return;
+      if (window.parent === window) { if (!fitBusy) { fitBusy = true; try { showAllFill(); } finally { fitBusy = false; } } return; }
+      if (!fitBusy) { fitBusy = true; try { fitToHost(); } finally { fitBusy = false; } }
       // Measure in-flow content, not the document box. A tall parent iframe
       // (for example a 7,800px starting min-height) would otherwise inflate
       // scrollHeight and the frame would never shrink on desktop.
@@ -2083,6 +2241,34 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
     }
     $("#btn-add-unit").addEventListener("click", () => setUnitCount(state.unitCount + 1));
     $("#btn-remove-unit").addEventListener("click", () => { if (state.unitCount > 4) setUnitCount(state.unitCount - 1); });
+    const swapTabs = $$(".swap-tabs [role=tab]");
+    const showSwap = (tab, focus) => {
+      swapTabs.forEach(t => {
+        const on = t === tab;
+        t.setAttribute("aria-selected", on ? "true" : "false");
+        t.tabIndex = on ? 0 : -1;
+        const p = document.getElementById(t.getAttribute("aria-controls"));
+        if (p) { p.classList.toggle("is-off", !on); if (on) p.removeAttribute("aria-hidden"); else p.setAttribute("aria-hidden", "true"); }
+      });
+      const panelsBox = document.querySelector(".swap-panels");
+      if (panelsBox) panelsBox.scrollTop = 0;
+      postResize();
+      if (focus) tab.focus();
+    };
+    swapTabs.forEach((t, i) => {
+      t.addEventListener("click", () => showSwap(t, false));
+      t.addEventListener("keydown", ev => {
+        if (ev.key !== "ArrowRight" && ev.key !== "ArrowLeft") return;
+        ev.preventDefault();
+        showSwap(swapTabs[(i + (ev.key === "ArrowRight" ? 1 : swapTabs.length - 1)) % swapTabs.length], true);
+      });
+    });
+    $("#more").setAttribute("aria-hidden", "true");
+    $$("[data-load-ex]").forEach(b => b.addEventListener("click", () => {
+      const key = b.getAttribute("data-load-ex");
+      setExampleSelect(key);
+      loadExample(key);
+    }));
     $("#btn-print").addEventListener("click", () => window.print());
     $("#btn-clear").addEventListener("click", clearData);
     window.addEventListener("resize", postResize);
