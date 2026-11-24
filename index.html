@@ -324,6 +324,49 @@ html.fit-mobile .swap-tabs button{font-size:13px;min-height:34px;padding:5px 10p
 html.fit-mobile .explainer li{margin:0 0 calc(5px + var(--fill-li,0px))}
 html.fit-mobile footer,html.fit-mobile footer.site{margin-top:16px;padding-top:12px;padding-bottom:12px}
 html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
+
+/* ===== Mobile tightening ===== */
+.drawer{border:1px solid var(--line);border-radius:10px;background:var(--inset);margin:8px 0 0;padding:0}
+.drawer>summary{cursor:pointer;font-weight:700;font-size:14.5px;color:var(--navy);padding:10px 12px;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;font-family:var(--font-body)}
+.drawer>summary::-webkit-details-marker{display:none}
+.drawer>summary::after{content:"Show";flex:0 0 auto;font-size:11px;font-weight:700;color:var(--sienna);letter-spacing:.04em;text-transform:uppercase}
+.drawer[open]>summary::after{content:"Hide"}
+.drawer .drawer-body{padding:0 12px 12px}
+.drawer .hint, .drawer .sec-help{margin-top:0}
+/* Tighter vertical rhythm */
+main{padding:12px 0 8px}
+.lede{margin:0 0 10px}
+.grid-page{gap:12px}
+.card{padding:14px 14px}
+h2{margin:0 0 4px}
+h3{margin:12px 0 6px}
+.sec-help{margin:0 0 8px}
+.field{margin:0 0 8px}
+.top{padding:12px 0 0}
+.top .brand{padding-bottom:10px}
+.start-here{padding:8px 10px;margin:0 0 8px}
+.start-here ol{margin:0 0 8px}
+footer,footer.site{margin-top:16px;padding:14px 0 24px;padding-top:12px}
+.saved{min-height:0;margin:6px 0 0}
+.kpis{gap:8px}
+.kpi .bench{display:none}
+.teach-note,.rate-note{margin:8px 0 0}
+#example-apr{margin:6px 0 8px;padding:8px 10px}
+/* Compact 2-column pairs where they stay legible (360px and up) */
+@media (min-width:360px){
+  .row-2,.row-3,.grid-page .row-3,
+  html.fit-mobile .row-2,html.fit-mobile .row-3,html.fit-mobile .grid-page .row-3{
+    grid-template-columns:1fr 1fr;
+  }
+  .kpis,html.fit-mobile .kpis{grid-template-columns:1fr 1fr}
+}
+@media (max-width:359px){
+  .row-2,.row-3,.grid-page .row-3,.kpis{grid-template-columns:1fr}
+}
+/* Keep units 2-up when two or more unit rent fields are showing */
+.units{grid-template-columns:1fr 1fr}
+@media (max-width:359px){ .units{grid-template-columns:1fr} }
+
 </style>
 </head>
 <body>
@@ -400,12 +443,17 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
           <input type="number" name="term" min="1" max="40" step="1">
         </label>
       </div>
-      <div class="row row-2">
-        <label class="field">Balloon after (years)
-          <span class="hint">Optional. Leave blank or 0 if there is no balloon. The monthly payment still uses the amortization term above, even if a balloon comes due sooner.</span>
-          <input type="number" name="balloon" min="0" max="40" step="1" inputmode="numeric">
-        </label>
-      </div>
+      <details class="drawer" id="drawer-advanced-loan">
+        <summary>Advanced loan option (balloon)</summary>
+        <div class="drawer-body">
+          <div class="row row-2">
+            <label class="field">Balloon after (years)
+              <span class="hint">Optional. Leave blank or 0 if there is no balloon. The monthly payment still uses the amortization term above, even if a balloon comes due sooner.</span>
+              <input type="number" name="balloon" min="0" max="40" step="1" inputmode="numeric">
+            </label>
+          </div>
+        </div>
+      </details>
       <p class="hint" id="loan-hint"></p>
       <p class="example-apr" id="example-apr" hidden></p>
       <p class="note-loan" id="fha-block-note" hidden>FHA house hack is for 1–4 unit properties, so it isn’t available for this building. The loan type was switched to Conventional.</p>
@@ -466,6 +514,9 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
         <div class="kpis" id="kpis"></div>
         <p class="teach-note">The $100 monthly cash-flow cushion, the 0.75% amber floor on the 1% rule, and the 65% expense-ratio amber cap are teaching aids, not published industry standards. Green, amber and red bands are general rules of thumb and are not advice.</p>
         <p class="rate-note">A deal can look strong on one measure and weak on another. Use the set together, then confirm the numbers with a lender and, for taxes, an advisor.</p>
+        <details class="drawer" id="drawer-fiveyear">
+          <summary>5-year breakdown (wealth chart)</summary>
+          <div class="drawer-body">
         <section class="hold-chart" id="hold-chart" aria-labelledby="hold-chart-h">
           <div class="hc-head">
             <h3 id="hold-chart-h">Wealth by year</h3>
@@ -485,6 +536,8 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
           </div>
           <p class="hold-chart-caption">Estimate based on your inputs. Not a prediction or a loan quote. <span id="hc-whatif-note">What-if sliders change this chart only.</span></p>
         </section>
+          </div>
+        </details>
       </section>
     </div>
   </div>
@@ -498,6 +551,9 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
   <section class="explainer swap-panel" id="explainer" role="tabpanel" aria-labelledby="explainer-h">
     <h2 id="explainer-h">KPIs of a successful rental</h2>
     <p class="sec-help">These are the measures most investors check first. None of them is a guarantee. Treat them as a common language for “does this property pay its way?”</p>
+    <details class="drawer" id="drawer-kpi-guide">
+      <summary>Plain-English KPI guide</summary>
+      <div class="drawer-body">
     <ul>
       <li><strong>Monthly cash flow</strong> is what’s left after operating costs and the mortgage. A rental that pays you is easier to hold than one you have to feed.</li>
       <li><strong>Cash-on-cash return</strong> is that annual cash flow divided by the cash you actually put in (down payment, closing costs, fees, and any upfront rehab / CapEx). Many investors use something in the 8–12% range as a starting screen for a leveraged rental — your target may be different.</li>
@@ -507,30 +563,45 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
       <li><strong>Expense ratio</strong> is the share of rent that goes to vacancy and operating costs — not the mortgage. A common planning shortcut, often called the “50% rule,” is that about half of the rent may be eaten by those costs over time. Another published shortcut (the “55% rule”) plans for about 45% of rent to go to expenses, leaving 55% as net operating income.</li>
       <li><strong>Rules of thumb vary.</strong> A tight cash-flow market may reward appreciation more than yield. A lender’s minimum is not the same as your goal. Always check local rents, taxes and actual loan terms.</li>
     </ul>
+      </div>
+    </details>
   </section>
 
   <div class="more swap-panel is-off" id="more" role="tabpanel" aria-labelledby="swap-tab-more">
     <div class="more-body">
       <p class="sec-help">These extras change cash invested and the five-year snapshot. Leave the examples if you’re just exploring.</p>
-      <div class="row row-3">
-        <label class="field">Closing costs (example)
-          <input type="number" name="closingCosts" min="0" step="1">
-        </label>
-        <label class="field">Other monthly income
-          <span class="hint">Pets, laundry, storage</span>
-          <input type="number" name="otherInc" min="0" step="1">
-        </label>
-        <label class="field">Example appreciation % / year
-          <span class="hint">A planning assumption, not a forecast</span>
-          <input type="number" name="appreciation" step="0.1" data-unit="pct" data-places="1">
-        </label>
-      </div>
-      <h3>Five-year equity snapshot</h3>
-      <p class="hint">Assumes the loan is paid as scheduled and value grows at your example appreciation rate. Principal paydown is included in equity. This is not a projection you should bank on, and it is not tax advice.</p>
-      <div class="snap" id="snap"></div>
+      <details class="drawer" id="drawer-advanced">
+        <summary>Advanced assumptions</summary>
+        <div class="drawer-body">
+          <div class="row row-3">
+            <label class="field">Closing costs (example)
+              <input type="number" name="closingCosts" min="0" step="1">
+            </label>
+            <label class="field">Other monthly income
+              <span class="hint">Pets, laundry, storage</span>
+              <input type="number" name="otherInc" min="0" step="1">
+            </label>
+            <label class="field">Example appreciation % / year
+              <span class="hint">A planning assumption, not a forecast</span>
+              <input type="number" name="appreciation" step="0.1" data-unit="pct" data-places="1">
+            </label>
+          </div>
+        </div>
+      </details>
+      <details class="drawer" id="drawer-snap">
+        <summary>Five-year equity snapshot</summary>
+        <div class="drawer-body">
+          <h3>Five-year equity snapshot</h3>
+          <p class="hint">Assumes the loan is paid as scheduled and value grows at your example appreciation rate. Principal paydown is included in equity. This is not a projection you should bank on, and it is not tax advice.</p>
+          <div class="snap" id="snap"></div>
+        </div>
+      </details>
     </div>
   </div>
   </div>
+  <details class="drawer" id="drawer-glossary">
+    <summary>Plain-English glossary</summary>
+    <div class="drawer-body">
   <div class="gloss" id="gloss" hidden>
     <h3 id="gloss-h">Terms used on this page</h3>
     <dl aria-labelledby="gloss-h">
@@ -549,6 +620,8 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
       <div class="gl-item" hidden><dt>What-if sliders</dt><dd>The rent growth and appreciation sliders on the Wealth by year chart change that chart only, not the cards above it.</dd></div>
     </dl>
   </div>
+    </div>
+  </details>
   </section>
 </main>
 <footer class="site wrap">
@@ -2090,6 +2163,18 @@ html.fit-mobile footer p,html.fit-mobile footer.site p{margin:0 0 4px}
   function fitToHost() {
     const panels = document.querySelector(".swap-panels");
     if (!panels) return;
+    // Skip the fixed FIT_POSTED pad so the natural, tighter height sizes the host.
+    let framedEarly;
+    try { framedEarly = window.self !== window.top; } catch (e) { framedEarly = true; }
+    if (framedEarly) {
+      panels.style.minHeight = "";
+      panels.style.maxHeight = "";
+      panels.style.removeProperty("--fill-li");
+      panels.style.removeProperty("--fill-more");
+      panels.classList.remove("is-clamped");
+      showAllFill();
+      return;
+    }
     let framed;
     try { framed = window.self !== window.top; } catch (e) { framed = true; }
     if (!framed) return;
