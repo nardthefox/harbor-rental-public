@@ -228,6 +228,9 @@ footer a:hover{color:#6E2F12}
   .print-recap{display:block;background:var(--inset);border-radius:8px;padding:10px 12px;margin:0 0 10px;font-size:12px;color:var(--ink)}
   .print-only{display:block}
   footer{padding-top:6px}
+  /* Closed drawers stay open on paper. The Show/Hide cue is screen-only. */
+  details.drawer > .drawer-body{display:block !important}
+  details.drawer > summary::after{content:none !important}
 }
 
 /* Preview only: example selector + stacked yearly wealth chart (v4) */
@@ -2354,6 +2357,21 @@ footer,footer.site{margin-top:16px;padding:14px 0 24px;padding-top:12px}
       setExampleSelect(key);
       loadExample(key);
     }));
+    // Download PDF calls window.print(), which fires beforeprint then afterprint.
+    // Open every drawer for the print, then restore each one to how the visitor left it.
+    let printDrawerState = null;
+    window.addEventListener("beforeprint", () => {
+      if (printDrawerState) return;
+      const list = $$("details.drawer");
+      printDrawerState = list.map(d => d.open);
+      list.forEach(d => { d.open = true; });
+    });
+    window.addEventListener("afterprint", () => {
+      if (!printDrawerState) return;
+      const prev = printDrawerState;
+      printDrawerState = null;
+      $$("details.drawer").forEach((d, i) => { d.open = !!prev[i]; });
+    });
     $("#btn-print").addEventListener("click", () => window.print());
     $("#btn-clear").addEventListener("click", clearData);
     window.addEventListener("resize", postResize);
